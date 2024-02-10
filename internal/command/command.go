@@ -4,6 +4,10 @@ type Command interface {
 	Execute()
 }
 
+type UndoableCommand interface {
+	Undo()
+}
+
 type StringCommand struct {
 	Abbreviation string
 	Description  string

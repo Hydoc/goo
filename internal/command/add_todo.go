@@ -7,20 +7,31 @@ var AddTodoAliases = []string{"a"}
 const (
 	AddTodoAbbr = "add"
 	AddTodoDesc = "Add a new todo"
+	AddTodoHelp = "use the command like so: add <label of the todo>"
 )
 
 type AddTodo struct {
-	todoList  *internal.TodoList
-	todoToAdd string
+	previousTodoListItems []*internal.Todo
+	todoList              *internal.TodoList
+	todoToAdd             string
 }
 
 func (cmd *AddTodo) Execute() {
-	cmd.todoList.Add(internal.NewTodo(cmd.todoToAdd))
+	cmd.previousTodoListItems = cmd.todoList.Items
+	cmd.todoList.Add(internal.NewTodo(cmd.todoToAdd, cmd.todoList.NextId()))
 }
 
-func NewAddTodo(todoToAdd string, todoList *internal.TodoList) *AddTodo {
+func (cmd *AddTodo) Undo() {
+	cmd.todoList.Items = cmd.previousTodoListItems
+}
+
+func NewAddTodo(todoList *internal.TodoList, todoToAdd string) *AddTodo {
 	return &AddTodo{
 		todoList:  todoList,
 		todoToAdd: todoToAdd,
 	}
+}
+
+func CanCreateAddTodo(payload string) bool {
+	return len(payload) > 0
 }

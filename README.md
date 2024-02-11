@@ -11,3 +11,5 @@ goo -file path/to/a/file.json
 1. The file has to be json
 2. If the file does not exist it gets created
 
+
+Saving only happens when quitting the application. SIGINT is currently not supported.

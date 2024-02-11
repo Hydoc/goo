@@ -43,3 +43,43 @@ func TestAddTodo_newAddTodo(t *testing.T) {
 		})
 	}
 }
+
+func TestAddTodo_Execute(t *testing.T) {
+	previousTodoList := []*internal.Todo{
+		{
+			Id:     1,
+			Label:  "Test",
+			IsDone: false,
+		},
+	}
+	todoList := &internal.TodoList{
+		Filename: "",
+		Items:    previousTodoList,
+	}
+
+	payload := "new task"
+	cmd, _ := newAddTodo(todoList, payload)
+
+	cmd.Execute()
+
+	if len(todoList.Items) == 1 {
+		t.Errorf("expected to add a todo")
+	}
+
+	addedTodo := todoList.Items[1]
+	if addedTodo.Label != payload {
+		t.Errorf("want label %v, got %v", payload, addedTodo.Label)
+	}
+
+	if addedTodo.Id != 2 {
+		t.Errorf("want id %d, got %d", 1, addedTodo.Id)
+	}
+
+	if addedTodo.IsDone {
+		t.Errorf("expected todo not to be done")
+	}
+
+	if !reflect.DeepEqual(cmd.previousTodoListItems, previousTodoList) {
+		t.Errorf("want previous todo list item %v, got %v", previousTodoList, cmd.previousTodoListItems)
+	}
+}

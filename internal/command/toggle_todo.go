@@ -22,6 +22,10 @@ func (toggle *ToggleTodo) Execute() {
 	toggle.todoList.Toggle(toggle.todoIdToToggle)
 }
 
+func (toggle *ToggleTodo) Undo() {
+	toggle.todoList.Toggle(toggle.todoIdToToggle)
+}
+
 func NewToggleTodo(list *internal.TodoList, idToToggle int) *ToggleTodo {
 	return &ToggleTodo{
 		todoList:       list,

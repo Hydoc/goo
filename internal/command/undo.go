@@ -15,3 +15,9 @@ type Undo struct {
 func (u *Undo) Execute() {
 	u.cmd.Undo()
 }
+
+func NewUndo(cmd *UndoableCommand) *Undo {
+	return &Undo{
+		cmd: *cmd,
+	}
+}

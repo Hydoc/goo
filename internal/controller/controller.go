@@ -7,10 +7,10 @@ import (
 )
 
 type Controller struct {
-	view         *view.StdoutView
-	todoList     *internal.TodoList
-	parser       *command.Parser
-	commandStack []*command.UndoableCommand
+	view      *view.StdoutView
+	todoList  *internal.TodoList
+	parser    *command.Parser
+	undoStack *command.UndoStack
 }
 
 func (ctr *Controller) Run() {
@@ -24,22 +24,23 @@ func (ctr *Controller) Run() {
 			nextError = nil
 		}
 		argument := ctr.view.Prompt()
-		cmd, err := ctr.parser.Parse(argument.RawCommand, argument.Payload, ctr.todoList, ctr.commandStack)
+		cmd, err := ctr.parser.Parse(argument.RawCommand, argument.Payload, ctr.todoList, ctr.undoStack)
 		if err != nil {
 			nextError = err
 			continue
 		}
 		cmd.Execute()
 		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
-			ctr.commandStack = append(ctr.commandStack, &undoable)
+			ctr.undoStack.Push(&undoable)
 		}
 	}
 }
 
-func New(view *view.StdoutView, list *internal.TodoList, parser *command.Parser) *Controller {
+func New(view *view.StdoutView, list *internal.TodoList, parser *command.Parser, undoStack *command.UndoStack) *Controller {
 	return &Controller{
-		view:     view,
-		todoList: list,
-		parser:   parser,
+		view:      view,
+		todoList:  list,
+		parser:    parser,
+		undoStack: undoStack,
 	}
 }

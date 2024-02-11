@@ -12,17 +12,17 @@ type Parser struct {
 	validCommands []*StringCommand
 }
 
-func (par *Parser) Parse(cmd, payload string, todoList *internal.TodoList, commandStack []*UndoableCommand) (Command, error) {
+func (par *Parser) Parse(cmd, payload string, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
 	for _, strCmd := range par.validCommands {
 		if cmd == strCmd.Abbreviation || slices.Contains(strCmd.Aliases, cmd) {
-			return par.fabricate(strCmd.Abbreviation, payload, todoList, commandStack)
+			return par.fabricate(strCmd.Abbreviation, payload, todoList, undoStack)
 		}
 	}
 
 	return nil, fmt.Errorf("could not find command '%s'", cmd)
 }
 
-func (par *Parser) fabricate(input, payload string, todoList *internal.TodoList, commandStack []*UndoableCommand) (Command, error) {
+func (par *Parser) fabricate(input, payload string, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
 	switch input {
 	case QuitAbbr:
 		return NewQuit(), nil
@@ -40,11 +40,10 @@ func (par *Parser) fabricate(input, payload string, todoList *internal.TodoList,
 		id, _ := strconv.Atoi(payload)
 		return NewToggleTodo(todoList, id), nil
 	case UndoAbbr:
-		if len(commandStack) == 0 {
+		if !undoStack.HasItems() {
 			return nil, errors.New(NothingToUndo)
 		}
-		return nil, nil
-		// TODO I may need the controller...
+		return NewUndo(undoStack.Pop()), nil
 	default:
 		return nil, nil
 	}

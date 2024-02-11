@@ -18,7 +18,8 @@ func main() {
 	todoList := internal.NewTodoList()
 	reader := bufio.NewReader(os.Stdin)
 	parser := command.NewParser([]*command.StringCommand{quit, help, addTodo, toggleTodo, undo})
+	undoStack := command.NewUndoStack()
 	v := view.New(reader)
-	cont := controller.New(v, todoList, parser)
+	cont := controller.New(v, todoList, parser, undoStack)
 	cont.Run()
 }

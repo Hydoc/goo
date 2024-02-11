@@ -29,7 +29,7 @@ func (v *StdoutView) Prompt() *Argument {
 	choiceSplit := strings.Split(strings.TrimSuffix(choice, "\n"), " ")
 	var payload string
 	if len(choiceSplit) > 1 {
-		payload = choiceSplit[1]
+		payload = strings.Join(choiceSplit[1:], " ")
 	}
 
 	return &Argument{

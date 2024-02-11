@@ -11,7 +11,7 @@ type Factory struct {
 func (f *Factory) Fabricate(parsedCmd *ParsedCommand, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
 	switch parsedCmd.abbreviation {
 	case QuitAbbr:
-		return newQuit(), nil
+		return newQuit(todoList), nil
 	case HelpAbbr:
 		return newHelp(f.validCommands), nil
 	case AddTodoAbbr:

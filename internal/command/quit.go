@@ -1,6 +1,7 @@
 package command
 
 import (
+	"github.com/Hydoc/goo/internal"
 	"os"
 )
 
@@ -11,12 +12,15 @@ const (
 	QuitDesc = "Quit the app"
 )
 
-type Quit struct{}
+type Quit struct {
+	todoList *internal.TodoList
+}
 
 func (cmd *Quit) Execute() {
+	cmd.todoList.SaveToFile()
 	os.Exit(0)
 }
 
-func newQuit() *Quit {
-	return &Quit{}
+func newQuit(todoList *internal.TodoList) *Quit {
+	return &Quit{todoList: todoList}
 }

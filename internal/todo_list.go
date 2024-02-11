@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"slices"
 )
 
 type TodoList struct {
-	Items []*Todo
+	Filename string
+	Items    []*Todo
 }
 
 func (list *TodoList) Add(todo *Todo) {
@@ -52,6 +55,11 @@ func (list *TodoList) NextId() int {
 	return list.Items[len(list.Items)-1].Id + 1
 }
 
+func (list *TodoList) SaveToFile() {
+	encoded, _ := json.Marshal(list.Items)
+	_ = os.WriteFile(list.Filename, encoded, 0644)
+}
+
 func (list *TodoList) String() string {
 	out := ""
 	for i, todo := range list.Items {
@@ -69,8 +77,16 @@ func (list *TodoList) String() string {
 	return out
 }
 
-func NewTodoList() *TodoList {
-	return &TodoList{
-		Items: make([]*Todo, 0),
+func NewTodoListFromFile(filename string) (*TodoList, error) {
+	var items []*Todo
+	jsonBytes, _ := os.ReadFile(filename)
+
+	err := json.Unmarshal(jsonBytes, &items)
+	if err != nil {
+		return nil, err
 	}
+	return &TodoList{
+		Filename: filename,
+		Items:    items,
+	}, nil
 }

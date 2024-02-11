@@ -1,9 +1,9 @@
 package internal
 
 type Todo struct {
-	Id     int
-	Label  string
-	IsDone bool
+	Id     int    `json:"id"`
+	Label  string `json:"label"`
+	IsDone bool   `json:"isDone"`
 }
 
 func NewTodo(label string, id int) *Todo {

@@ -1,11 +1,13 @@
 package command
 
+import "errors"
+
 var UndoAliases = []string{"u"}
 
 const (
 	UndoAbbr      = "undo"
 	UndoDesc      = "Undo the last action"
-	NothingToUndo = "nothing to undo"
+	nothingToUndo = "nothing to undo"
 )
 
 type Undo struct {
@@ -16,8 +18,12 @@ func (u *Undo) Execute() {
 	u.cmd.Undo()
 }
 
-func NewUndo(cmd *UndoableCommand) *Undo {
-	return &Undo{
-		cmd: *cmd,
+func newUndo(undoStack *UndoStack) (*Undo, error) {
+	if !undoStack.HasItems() {
+		return nil, errors.New(nothingToUndo)
 	}
+
+	return &Undo{
+		cmd: undoStack.Pop(),
+	}, nil
 }

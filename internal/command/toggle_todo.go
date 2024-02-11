@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"github.com/Hydoc/goo/internal"
 	"strconv"
 )
@@ -8,9 +9,10 @@ import (
 var ToggleTodoAliases = []string{"t"}
 
 const (
-	ToggleTodoAbbr = "toggle"
-	ToggleTodoDesc = "Toggle the done state of a todo"
-	ToggleTodoHelp = "use the command like so: toggle <id of the todo>"
+	ToggleTodoAbbr  = "toggle"
+	ToggleTodoDesc  = "Toggle the done state of a todo"
+	toggleTodoUsage = "use the command like so: toggle <id of the todo>"
+	nothingToToggle = "nothing to toggle"
 )
 
 type ToggleTodo struct {
@@ -26,14 +28,19 @@ func (toggle *ToggleTodo) Undo() {
 	toggle.todoList.Toggle(toggle.todoIdToToggle)
 }
 
-func NewToggleTodo(list *internal.TodoList, idToToggle int) *ToggleTodo {
-	return &ToggleTodo{
-		todoList:       list,
-		todoIdToToggle: idToToggle,
-	}
-}
+func newToggleTodo(todoList *internal.TodoList, payload string) (*ToggleTodo, error) {
+	id, err := strconv.Atoi(payload)
 
-func CanCreateToggleTodo(payload string) bool {
-	_, err := strconv.Atoi(payload)
-	return len(payload) > 0 && err == nil
+	if err != nil {
+		return nil, errors.New(toggleTodoUsage)
+	}
+
+	if !todoList.Has(id) {
+		return nil, errors.New(nothingToToggle)
+	}
+
+	return &ToggleTodo{
+		todoList:       todoList,
+		todoIdToToggle: id,
+	}, nil
 }

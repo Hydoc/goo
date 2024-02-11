@@ -1,6 +1,9 @@
 package internal
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type TodoList struct {
 	Items []*Todo
@@ -8,6 +11,24 @@ type TodoList struct {
 
 func (list *TodoList) Add(todo *Todo) {
 	list.Items = append(list.Items, todo)
+}
+
+func (list *TodoList) Has(id int) bool {
+	for _, todo := range list.Items {
+		if todo.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (list *TodoList) Remove(id int) {
+	i := slices.IndexFunc(list.Items, func(todo *Todo) bool {
+		return todo.Id == id
+	})
+	if i != -1 {
+		list.Items = append(list.Items[:i], list.Items[i+1:]...)
+	}
 }
 
 func (list *TodoList) HasItems() bool {

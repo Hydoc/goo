@@ -1,16 +1,16 @@
 package command
 
 type UndoStack struct {
-	items []*UndoableCommand
+	items []UndoableCommand
 }
 
-func (stack *UndoStack) Pop() *UndoableCommand {
+func (stack *UndoStack) Pop() UndoableCommand {
 	cmd, items := stack.items[len(stack.items)-1], stack.items[:len(stack.items)-1]
 	stack.items = items
 	return cmd
 }
 
-func (stack *UndoStack) Push(cmd *UndoableCommand) {
+func (stack *UndoStack) Push(cmd UndoableCommand) {
 	stack.items = append(stack.items, cmd)
 }
 
@@ -20,6 +20,6 @@ func (stack *UndoStack) HasItems() bool {
 
 func NewUndoStack() *UndoStack {
 	return &UndoStack{
-		items: make([]*UndoableCommand, 0),
+		items: make([]UndoableCommand, 0),
 	}
 }

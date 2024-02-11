@@ -11,6 +11,7 @@ type Controller struct {
 	todoList  *internal.TodoList
 	parser    *command.Parser
 	undoStack *command.UndoStack
+	factory   *command.Factory
 }
 
 func (ctr *Controller) Run() {
@@ -24,23 +25,29 @@ func (ctr *Controller) Run() {
 			nextError = nil
 		}
 		argument := ctr.view.Prompt()
-		cmd, err := ctr.parser.Parse(argument.RawCommand, argument.Payload, ctr.todoList, ctr.undoStack)
+		parsedCmd, err := ctr.parser.Parse(argument)
+		if err != nil {
+			nextError = err
+			continue
+		}
+		cmd, err := ctr.factory.Fabricate(parsedCmd, ctr.todoList, ctr.undoStack)
 		if err != nil {
 			nextError = err
 			continue
 		}
 		cmd.Execute()
 		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
-			ctr.undoStack.Push(&undoable)
+			ctr.undoStack.Push(undoable)
 		}
 	}
 }
 
-func New(view *view.StdoutView, list *internal.TodoList, parser *command.Parser, undoStack *command.UndoStack) *Controller {
+func New(view *view.StdoutView, list *internal.TodoList, parser *command.Parser, undoStack *command.UndoStack, factory *command.Factory) *Controller {
 	return &Controller{
 		view:      view,
 		todoList:  list,
 		parser:    parser,
 		undoStack: undoStack,
+		factory:   factory,
 	}
 }

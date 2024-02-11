@@ -1,52 +1,28 @@
 package command
 
 import (
-	"errors"
 	"fmt"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/view"
 	"slices"
-	"strconv"
 )
 
 type Parser struct {
 	validCommands []*StringCommand
 }
 
-func (par *Parser) Parse(cmd, payload string, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
-	for _, strCmd := range par.validCommands {
-		if cmd == strCmd.Abbreviation || slices.Contains(strCmd.Aliases, cmd) {
-			return par.fabricate(strCmd.Abbreviation, payload, todoList, undoStack)
-		}
-	}
-
-	return nil, fmt.Errorf("could not find command '%s'", cmd)
+type ParsedCommand struct {
+	abbreviation string
+	payload      string
 }
 
-func (par *Parser) fabricate(input, payload string, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
-	switch input {
-	case QuitAbbr:
-		return NewQuit(), nil
-	case HelpAbbr:
-		return NewHelp(par.validCommands), nil
-	case AddTodoAbbr:
-		if !CanCreateAddTodo(payload) {
-			return nil, errors.New(AddTodoHelp)
+func (par *Parser) Parse(arg *view.Argument) (*ParsedCommand, error) {
+	for _, strCmd := range par.validCommands {
+		if arg.RawCommand == strCmd.Abbreviation || slices.Contains(strCmd.Aliases, arg.RawCommand) {
+			return &ParsedCommand{abbreviation: strCmd.Abbreviation, payload: arg.Payload}, nil
 		}
-		return NewAddTodo(todoList, payload), nil
-	case ToggleTodoAbbr:
-		if !CanCreateToggleTodo(payload) {
-			return nil, errors.New(ToggleTodoHelp)
-		}
-		id, _ := strconv.Atoi(payload)
-		return NewToggleTodo(todoList, id), nil
-	case UndoAbbr:
-		if !undoStack.HasItems() {
-			return nil, errors.New(NothingToUndo)
-		}
-		return NewUndo(undoStack.Pop()), nil
-	default:
-		return nil, nil
 	}
+
+	return nil, fmt.Errorf("could not find command '%s'", arg.RawCommand)
 }
 
 func NewParser(validCommands []*StringCommand) *Parser {

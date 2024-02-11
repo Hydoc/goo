@@ -29,7 +29,7 @@ func (h *Help) Execute() {
 	fmt.Println(commandsAsStr)
 }
 
-func NewHelp(validCommands []*StringCommand) *Help {
+func newHelp(validCommands []*StringCommand) *Help {
 	return &Help{
 		validCommands: validCommands,
 	}

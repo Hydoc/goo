@@ -17,6 +17,6 @@ func (q *Quit) Execute() {
 	os.Exit(0)
 }
 
-func NewQuit() *Quit {
+func newQuit() *Quit {
 	return &Quit{}
 }

@@ -20,7 +20,8 @@ type AddTodo struct {
 }
 
 func (cmd *AddTodo) Execute() {
-	cmd.previousTodoListItems = cmd.todoList.Items
+	cmd.previousTodoListItems = make([]*internal.Todo, len(cmd.todoList.Items))
+	copy(cmd.previousTodoListItems, cmd.todoList.Items)
 	cmd.todoList.Add(internal.NewTodo(cmd.todoToAdd, cmd.todoList.NextId()))
 }
 

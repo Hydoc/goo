@@ -13,7 +13,7 @@ const (
 
 type Quit struct{}
 
-func (q *Quit) Execute() {
+func (cmd *Quit) Execute() {
 	os.Exit(0)
 }
 

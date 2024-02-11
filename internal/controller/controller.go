@@ -22,7 +22,10 @@ func (ctr *Controller) Run() {
 			ctr.view.ClearScreen()
 		}
 		if ctr.todoList.HasItems() {
+			ctr.view.RenderLine("Your list:")
 			ctr.view.RenderLine(ctr.todoList.String())
+		} else {
+			ctr.view.RenderLine("You currently have no todos")
 		}
 		if nextError != nil {
 			ctr.view.RenderLine(nextError.Error())

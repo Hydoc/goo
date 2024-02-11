@@ -21,13 +21,14 @@ type DeleteTodo struct {
 	idToDelete            int
 }
 
-func (d *DeleteTodo) Execute() {
-	d.previousTodoListItems = d.todoList.Items
-	d.todoList.Remove(d.idToDelete)
+func (cmd *DeleteTodo) Execute() {
+	cmd.previousTodoListItems = make([]*internal.Todo, len(cmd.todoList.Items))
+	copy(cmd.previousTodoListItems, cmd.todoList.Items)
+	cmd.todoList.Remove(cmd.idToDelete)
 }
 
-func (d *DeleteTodo) Undo() {
-	d.todoList.Items = d.previousTodoListItems
+func (cmd *DeleteTodo) Undo() {
+	cmd.todoList.Items = cmd.previousTodoListItems
 }
 
 func newDeleteTodo(todoList *internal.TodoList, payload string) (*DeleteTodo, error) {

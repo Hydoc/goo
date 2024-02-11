@@ -20,12 +20,12 @@ type ToggleTodo struct {
 	todoIdToToggle int
 }
 
-func (toggle *ToggleTodo) Execute() {
-	toggle.todoList.Toggle(toggle.todoIdToToggle)
+func (cmd *ToggleTodo) Execute() {
+	cmd.todoList.Toggle(cmd.todoIdToToggle)
 }
 
-func (toggle *ToggleTodo) Undo() {
-	toggle.todoList.Toggle(toggle.todoIdToToggle)
+func (cmd *ToggleTodo) Undo() {
+	cmd.todoList.Toggle(cmd.todoIdToToggle)
 }
 
 func newToggleTodo(todoList *internal.TodoList, payload string) (*ToggleTodo, error) {

@@ -16,12 +16,12 @@ type Help struct {
 	validCommands []*StringCommand
 }
 
-func (h *Help) Execute() {
+func (cmd *Help) Execute() {
 	commandsAsStr := "Here is a list of all possible commands:\r\n"
 
-	for i, strCmd := range h.validCommands {
+	for i, strCmd := range cmd.validCommands {
 		commandsAsStr += fmt.Sprintf("%s: %s (aliases: %s)", strCmd.Abbreviation, strCmd.Description, strings.Join(strCmd.Aliases, ", "))
-		if i != len(h.validCommands)-1 {
+		if i != len(cmd.validCommands)-1 {
 			commandsAsStr += "\r\n"
 		}
 	}

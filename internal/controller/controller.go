@@ -26,6 +26,7 @@ func (ctr *Controller) Run() {
 			ctr.view.RenderLine(ctr.todoList.String())
 		} else {
 			ctr.view.RenderLine("You currently have no todos")
+			ctr.view.RenderLine("Type 'help' for an overview of all commands")
 		}
 		if nextError != nil {
 			ctr.view.RenderLine(nextError.Error())

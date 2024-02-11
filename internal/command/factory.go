@@ -22,6 +22,8 @@ func (f *Factory) Fabricate(parsedCmd *ParsedCommand, todoList *internal.TodoLis
 		return newUndo(undoStack)
 	case DeleteTodoAbbr:
 		return newDeleteTodo(todoList, parsedCmd.payload)
+	case EditTodoAbbr:
+		return newEditTodo(todoList, parsedCmd.payload)
 	default:
 		return nil, nil
 	}

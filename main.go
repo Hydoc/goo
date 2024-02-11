@@ -36,7 +36,8 @@ func main() {
 	toggleTodo := command.NewStringCommand(command.ToggleTodoAbbr, command.ToggleTodoDesc, command.ToggleTodoAliases)
 	undo := command.NewStringCommand(command.UndoAbbr, command.UndoDesc, command.UndoAliases)
 	deleteTodo := command.NewStringCommand(command.DeleteTodoAbbr, command.DeleteTodoDesc, command.DeleteTodoAliases)
-	validCommands := []*command.StringCommand{quit, help, addTodo, toggleTodo, undo, deleteTodo}
+	editTodo := command.NewStringCommand(command.EditTodoAbbr, command.EditTodoDesc, command.EditTodoAliases)
+	validCommands := []*command.StringCommand{quit, help, addTodo, toggleTodo, undo, deleteTodo, editTodo}
 	todoList, err := internal.NewTodoListFromFile(filename)
 	if err != nil {
 		panic(err)

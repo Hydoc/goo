@@ -16,6 +16,23 @@ func (list *TodoList) Add(todo *Todo) {
 	list.Items = append(list.Items, todo)
 }
 
+func (list *TodoList) Find(id int) *Todo {
+	for _, todo := range list.Items {
+		if todo.Id == id {
+			return todo
+		}
+	}
+	return nil
+}
+
+func (list *TodoList) Edit(id int, label string) {
+	for _, todo := range list.Items {
+		if todo.Id == id {
+			todo.Label = label
+		}
+	}
+}
+
 func (list *TodoList) Has(id int) bool {
 	for _, todo := range list.Items {
 		if todo.Id == id {

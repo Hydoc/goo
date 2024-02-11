@@ -9,7 +9,7 @@ var QuitAliases = []string{"q"}
 
 const (
 	QuitAbbr = "quit"
-	QuitDesc = "Quit the app"
+	QuitDesc = "Quit the app and save"
 )
 
 type Quit struct {

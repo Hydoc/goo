@@ -3,6 +3,9 @@ package view
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -13,6 +16,19 @@ type Argument struct {
 
 type StdoutView struct {
 	reader *bufio.Reader
+}
+
+func (v *StdoutView) ClearScreen() {
+	switch runtime.GOOS {
+	case "linux":
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	case "windows":
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
 }
 
 func (v *StdoutView) Render(str string) {

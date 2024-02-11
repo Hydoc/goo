@@ -16,7 +16,11 @@ type Controller struct {
 
 func (ctr *Controller) Run() {
 	var nextError error
+	doClearScreen := true
 	for {
+		if doClearScreen {
+			ctr.view.ClearScreen()
+		}
 		if ctr.todoList.HasItems() {
 			ctr.view.RenderLine(ctr.todoList.String())
 		}
@@ -36,6 +40,9 @@ func (ctr *Controller) Run() {
 			continue
 		}
 		cmd.Execute()
+		// do not clear screen when command is help otherwise it vanishes
+		_, isHelp := cmd.(*command.Help)
+		doClearScreen = !isHelp
 		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
 			ctr.undoStack.Push(undoable)
 		}

@@ -15,7 +15,7 @@ import (
 var filename string
 
 func main() {
-	flag.StringVar(&filename, "file", "", "-file path to file to read (has to be json, if the file does not exists it gets created)")
+	flag.StringVar(&filename, "file", "", "-file path to file to read (has to be json, if the file does not exist it gets created)")
 	flag.Parse()
 
 	if len(filename) == 0 {

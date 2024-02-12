@@ -1,7 +1,6 @@
 [![codecov](https://codecov.io/gh/Hydoc/goo/graph/badge.svg?token=5TWYKUEG84)](https://codecov.io/gh/Hydoc/goo)
 
 # Goo
-
 A simple CLI todo list written in Go that supports different files.
 
 Example

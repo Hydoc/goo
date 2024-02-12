@@ -14,7 +14,7 @@ goo -file path/to/a/file.json
 2. If the file does not exist it gets created
 
 
-Saving only happens when quitting the application.
+Saving only happens when using the `quit` command.
 
 The following commands are currently supported:
 1. `add`

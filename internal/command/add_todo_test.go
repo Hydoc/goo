@@ -83,3 +83,26 @@ func TestAddTodo_Execute(t *testing.T) {
 		t.Errorf("want previous todo list item %v, got %v", previousTodoList, cmd.previousTodoListItems)
 	}
 }
+
+func TestAddTodo_Undo(t *testing.T) {
+	previousTodoList := []*internal.Todo{
+		{
+			Id:     1,
+			Label:  "Test",
+			IsDone: false,
+		},
+	}
+	todoList := &internal.TodoList{
+		Filename: "",
+		Items:    previousTodoList,
+	}
+
+	payload := "new task"
+	cmd, _ := newAddTodo(todoList, payload)
+	cmd.Execute()
+	cmd.Undo()
+
+	if !reflect.DeepEqual(todoList.Items, previousTodoList) {
+		t.Errorf("want list %v, got %v", previousTodoList, todoList.Items)
+	}
+}

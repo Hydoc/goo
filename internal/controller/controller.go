@@ -36,11 +36,13 @@ func (ctr *Controller) Run() {
 		parsedCmd, err := ctr.parser.Parse(argument)
 		if err != nil {
 			nextError = err
+			doClearScreen = true
 			continue
 		}
 		cmd, err := ctr.factory.Fabricate(parsedCmd, ctr.todoList, ctr.undoStack)
 		if err != nil {
 			nextError = err
+			doClearScreen = true
 			continue
 		}
 		cmd.Execute()

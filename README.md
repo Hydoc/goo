@@ -1,3 +1,4 @@
+[![Tests](https://github.com/Hydoc/goo/actions/workflows/test.yaml/badge.svg)](https://github.com/Hydoc/goo/actions/workflows/test.yaml)
 [![codecov](https://codecov.io/gh/Hydoc/goo/graph/badge.svg?token=5TWYKUEG84)](https://codecov.io/gh/Hydoc/goo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Hydoc/goo)](https://goreportcard.com/report/github.com/Hydoc/goo)
 

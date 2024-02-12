@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"github.com/Hydoc/goo/internal/view"
 	"strings"
 )
 
@@ -13,6 +14,7 @@ const (
 )
 
 type Help struct {
+	view          *view.StdoutView
 	validCommands []*StringCommand
 }
 
@@ -25,12 +27,12 @@ func (cmd *Help) Execute() {
 			commandsAsStr += "\r\n"
 		}
 	}
-
-	fmt.Println(commandsAsStr)
+	cmd.view.RenderLine(commandsAsStr)
 }
 
-func newHelp(validCommands []*StringCommand) *Help {
+func newHelp(view *view.StdoutView, validCommands []*StringCommand) *Help {
 	return &Help{
+		view:          view,
 		validCommands: validCommands,
 	}
 }

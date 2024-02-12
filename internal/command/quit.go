@@ -2,7 +2,6 @@ package command
 
 import (
 	"github.com/Hydoc/goo/internal"
-	"os"
 )
 
 var QuitAliases = []string{"q"}
@@ -18,7 +17,6 @@ type Quit struct {
 
 func (cmd *Quit) Execute() {
 	cmd.todoList.SaveToFile()
-	os.Exit(0)
 }
 
 func newQuit(todoList *internal.TodoList) *Quit {

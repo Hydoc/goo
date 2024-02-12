@@ -17,7 +17,8 @@ type Controller struct {
 func (ctr *Controller) Run() {
 	var nextError error
 	doClearScreen := true
-	for {
+	doQuit := false
+	for !doQuit {
 		if doClearScreen {
 			ctr.view.ClearScreen()
 		}
@@ -39,16 +40,20 @@ func (ctr *Controller) Run() {
 			doClearScreen = true
 			continue
 		}
-		cmd, err := ctr.factory.Fabricate(parsedCmd, ctr.todoList, ctr.undoStack)
+		cmd, err := ctr.factory.Fabricate(parsedCmd, ctr.todoList, ctr.undoStack, ctr.view)
 		if err != nil {
 			nextError = err
 			doClearScreen = true
 			continue
 		}
 		cmd.Execute()
-		// do not clear screen when command is help otherwise it vanishes
-		_, isHelp := cmd.(*command.Help)
-		doClearScreen = !isHelp
+		switch cmd.(interface{}).(type) {
+		case *command.Help:
+			// do not clear screen when command is help otherwise it vanishes
+			doClearScreen = false
+		case *command.Quit:
+			doQuit = true
+		}
 		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
 			ctr.undoStack.Push(undoable)
 		}

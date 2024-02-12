@@ -3,6 +3,7 @@ package view
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -16,6 +17,7 @@ type Argument struct {
 
 type StdoutView struct {
 	reader *bufio.Reader
+	writer io.Writer
 }
 
 func (v *StdoutView) ClearScreen() {
@@ -32,11 +34,11 @@ func (v *StdoutView) ClearScreen() {
 }
 
 func (v *StdoutView) Render(str string) {
-	fmt.Print(str)
+	fmt.Fprint(v.writer, str)
 }
 
 func (v *StdoutView) RenderLine(str string) {
-	fmt.Println(str)
+	fmt.Fprintln(v.writer, str)
 }
 
 func (v *StdoutView) Prompt() *Argument {
@@ -54,8 +56,9 @@ func (v *StdoutView) Prompt() *Argument {
 	}
 }
 
-func New(reader *bufio.Reader) *StdoutView {
+func New(reader *bufio.Reader, writer io.Writer) *StdoutView {
 	return &StdoutView{
 		reader: reader,
+		writer: writer,
 	}
 }

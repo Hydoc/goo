@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/view"
 	"reflect"
 	"testing"
 )
@@ -77,7 +78,7 @@ func TestFactory_Fabricate(t *testing.T) {
 				abbreviation: HelpAbbr,
 				payload:      "",
 			},
-			want:     &Help{validCommands: validCommands},
+			want:     &Help{validCommands: validCommands, view: &view.StdoutView{}},
 			todoList: todoList,
 		},
 		{
@@ -152,7 +153,7 @@ func TestFactory_Fabricate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			factory := NewFactory(validCommands)
-			got, _ := factory.Fabricate(test.parsedCommand, test.todoList, &UndoStack{items: []UndoableCommand{&DummyUndoableCommand{}}})
+			got, _ := factory.Fabricate(test.parsedCommand, test.todoList, &UndoStack{items: []UndoableCommand{&DummyUndoableCommand{}}}, &view.StdoutView{})
 
 			if !reflect.DeepEqual(got, test.want) {
 				t.Errorf("want %v, got %v", test.want, got)

@@ -9,12 +9,14 @@ import (
 	"github.com/Hydoc/goo/internal/command"
 	"github.com/Hydoc/goo/internal/controller"
 	"github.com/Hydoc/goo/internal/view"
+	"log"
 	"os"
 )
 
 var filename string
 
 func main() {
+	log.SetFlags(0)
 	flag.StringVar(&filename, "file", "", "-file path to file to read (has to be json, if the file does not exist it gets created)")
 	flag.Parse()
 
@@ -42,11 +44,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	reader := bufio.NewReader(os.Stdin)
 	parser := command.NewParser(validCommands)
 	factory := command.NewFactory(validCommands)
 	undoStack := command.NewUndoStack()
-	v := view.New(reader)
+	v := view.New(bufio.NewReader(os.Stdin), os.Stdout)
 	ctr := controller.New(v, todoList, parser, undoStack, factory)
 	ctr.Run()
 }

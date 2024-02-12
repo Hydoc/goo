@@ -2,18 +2,19 @@ package command
 
 import (
 	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/view"
 )
 
 type Factory struct {
 	validCommands []*StringCommand
 }
 
-func (f *Factory) Fabricate(parsedCmd *ParsedCommand, todoList *internal.TodoList, undoStack *UndoStack) (Command, error) {
+func (f *Factory) Fabricate(parsedCmd *ParsedCommand, todoList *internal.TodoList, undoStack *UndoStack, view *view.StdoutView) (Command, error) {
 	switch parsedCmd.abbreviation {
 	case QuitAbbr:
 		return newQuit(todoList), nil
 	case HelpAbbr:
-		return newHelp(f.validCommands), nil
+		return newHelp(view, f.validCommands), nil
 	case AddTodoAbbr:
 		return newAddTodo(todoList, parsedCmd.payload)
 	case ToggleTodoAbbr:

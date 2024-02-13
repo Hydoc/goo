@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestEditTodo_newEditTodo(t *testing.T) {
+func TestNewEditTodo(t *testing.T) {
 	tests := []struct {
 		name     string
 		todoList *internal.TodoList
@@ -57,7 +57,7 @@ func TestEditTodo_newEditTodo(t *testing.T) {
 				},
 			},
 			payload: "Bla {} bla",
-			err:     errors.New(editTodoUsage),
+			err:     errors.New("can not edit todo, id is missing"),
 			want:    nil,
 		},
 		{
@@ -73,7 +73,7 @@ func TestEditTodo_newEditTodo(t *testing.T) {
 				},
 			},
 			payload: "1",
-			err:     errors.New(editTodoUsage),
+			err:     errors.New("empty todo is not allowed"),
 			want:    nil,
 		},
 		{
@@ -89,14 +89,14 @@ func TestEditTodo_newEditTodo(t *testing.T) {
 				},
 			},
 			payload: "53",
-			err:     errors.New(nothingToEdit),
+			err:     errors.New("there is no todo with id 53"),
 			want:    nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newEditTodo(test.todoList, test.payload)
+			got, err := NewEditTodo(test.todoList, test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -123,34 +123,11 @@ func TestEditTodo_Execute(t *testing.T) {
 	payload := "1 Bla {} bla"
 	wantLabel := "Bla Test bla"
 
-	cmd, _ := newEditTodo(todoList, payload)
+	cmd, _ := NewEditTodo(todoList, payload)
 	cmd.Execute()
 
 	editedItem := todoList.Items[0]
 	if editedItem.Label != wantLabel {
 		t.Errorf("want label %v, got %v", wantLabel, editedItem.Label)
-	}
-}
-
-func TestEditTodo_Undo(t *testing.T) {
-	previousLabel := "Test"
-	todoList := &internal.TodoList{
-		Filename: "",
-		Items: []*internal.Todo{
-			{
-				Id:     1,
-				Label:  previousLabel,
-				IsDone: false,
-			},
-		},
-	}
-	payload := "1 Bla {} bla"
-	cmd, _ := newEditTodo(todoList, payload)
-	cmd.Execute()
-	cmd.Undo()
-
-	firstItem := todoList.Items[0]
-	if firstItem.Label != previousLabel {
-		t.Errorf("expected to undo the edit, want %v, got %v", previousLabel, firstItem.Label)
 	}
 }

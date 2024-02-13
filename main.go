@@ -4,50 +4,101 @@ import (
 	"bufio"
 	"errors"
 	"flag"
-	"fmt"
 	"github.com/Hydoc/goo/internal"
-	"github.com/Hydoc/goo/internal/command"
 	"github.com/Hydoc/goo/internal/controller"
 	"github.com/Hydoc/goo/internal/view"
-	"log"
 	"os"
+	"path/filepath"
+	"strings"
+)
+
+const (
+	defaultFileName = ".goo.json"
+	usage           = `How to use goo
+  -h, --help
+    	Prints this information
+
+  -f, --file
+    	Path to a file to use (has to be json, if the file does not exist it gets created)
+
+  -l, --list
+        List all todos
+
+  -t, --toggle
+        Toggle the state of a todo by its id
+
+  -d, --delete
+        Delete a todo by its id
+
+  -e, --edit
+        Edit a todo by its id and a new label, use '{}' to insert the old value
+             e.g goo --edit 1 {} World!
+
+  -a, --add
+        Add a new todo`
 )
 
 var filename string
 
 func main() {
-	log.SetFlags(0)
-	flag.StringVar(&filename, "file", "", "-file path to file to read (has to be json, if the file does not exist it gets created)")
+	v := view.New(bufio.NewReader(os.Stdin), os.Stdout)
+	file := flag.String("file", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
+	flag.StringVar(file, "f", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
+
+	list := flag.Bool("list", false, "List all todos")
+	flag.BoolVar(list, "l", false, "List all todos")
+
+	toggle := flag.Int("toggle", 0, "Toggle the state of a todo by its id")
+	flag.IntVar(toggle, "t", 0, "Toggle the state of a todo by its id")
+
+	add := flag.Bool("add", false, "Add a new todo")
+	flag.BoolVar(add, "a", false, "Add a new todo")
+
+	doDelete := flag.Int("delete", 0, "Delete a todo by its id")
+	flag.IntVar(doDelete, "d", 0, "Delete a todo by its id")
+
+	edit := flag.Bool("edit", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
+	flag.BoolVar(edit, "e", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
+
+	flag.Usage = func() {
+		v.RenderLine(usage)
+	}
 	flag.Parse()
 
+	if len(*file) > 0 {
+		filename = *file
+	}
+
 	if len(filename) == 0 {
-		fmt.Println("file is missing, run goo -file <path to file>")
-		return
+		home, err := os.UserHomeDir()
+		if err != nil {
+			panic(err)
+		}
+		filename = filepath.Join(home, defaultFileName)
 	}
 
 	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
 		err = os.WriteFile(filename, []byte("[]"), 0644)
 		if err != nil {
-			panic(err)
+			v.RenderLine(err.Error())
+			os.Exit(1)
 		}
 	}
 
-	quit := command.NewStringCommand(command.QuitAbbr, command.QuitDesc, command.QuitAliases)
-	help := command.NewStringCommand(command.HelpAbbr, command.HelpDesc, command.HelpAliases)
-	addTodo := command.NewStringCommand(command.AddTodoAbbr, command.AddTodoDesc, command.AddTodoAliases)
-	toggleTodo := command.NewStringCommand(command.ToggleTodoAbbr, command.ToggleTodoDesc, command.ToggleTodoAliases)
-	undo := command.NewStringCommand(command.UndoAbbr, command.UndoDesc, command.UndoAliases)
-	deleteTodo := command.NewStringCommand(command.DeleteTodoAbbr, command.DeleteTodoDesc, command.DeleteTodoAliases)
-	editTodo := command.NewStringCommand(command.EditTodoAbbr, command.EditTodoDesc, command.EditTodoAliases)
-	validCommands := []*command.StringCommand{quit, help, addTodo, toggleTodo, undo, deleteTodo, editTodo}
 	todoList, err := internal.NewTodoListFromFile(filename)
 	if err != nil {
-		panic(err)
+		v.RenderLine(err.Error())
+		os.Exit(1)
 	}
-	parser := command.NewParser(validCommands)
-	factory := command.NewFactory(validCommands)
-	undoStack := command.NewUndoStack()
-	v := view.New(bufio.NewReader(os.Stdin), os.Stdout)
-	ctr := controller.New(v, todoList, parser, undoStack, factory)
-	ctr.Run()
+
+	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
+	ctr := controller.New(v, todoList)
+	code, err := ctr.Handle(list, toggle, add, doDelete, edit, args)
+	if err != nil {
+		v.RenderLine(err.Error())
+	}
+	if code == 0 && !*list {
+		v.RenderList(todoList)
+	}
+	os.Exit(code)
 }

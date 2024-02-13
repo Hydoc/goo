@@ -5,10 +5,6 @@ import (
 	"fmt"
 	"github.com/Hydoc/goo/internal"
 	"io"
-	"log"
-	"os"
-	"os/exec"
-	"runtime"
 	"strconv"
 	"strings"
 )
@@ -17,27 +13,9 @@ const (
 	colorGray = "gray"
 )
 
-type Argument struct {
-	RawCommand string
-	Payload    string
-}
-
 type StdoutView struct {
 	reader *bufio.Reader
 	writer io.Writer
-}
-
-func (v *StdoutView) ClearScreen() {
-	switch runtime.GOOS {
-	case "linux":
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	case "windows":
-		cmd := exec.Command("cmd", "/c", "cls")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
 }
 
 func (v *StdoutView) Render(str string) {
@@ -78,14 +56,6 @@ func (v *StdoutView) RenderList(todoList *internal.TodoList) {
 	}
 }
 
-func (v *StdoutView) moveToBottom() {
-	fmt.Printf("\x1B[%d;0f", v.getTerminalWidth())
-}
-
-func (v *StdoutView) bold(str string) string {
-	return fmt.Sprintf("\033[1m%s\033[0m", str)
-}
-
 func (v *StdoutView) toColor(str, color string) string {
 	switch color {
 	case colorGray:
@@ -93,33 +63,6 @@ func (v *StdoutView) toColor(str, color string) string {
 	default:
 		return str
 	}
-}
-
-func (v *StdoutView) Prompt() *Argument {
-	v.moveToBottom()
-	v.Render("> ")
-	choice, _ := v.reader.ReadString('\n')
-	choiceSplit := strings.Split(strings.TrimSuffix(choice, "\n"), " ")
-	var payload string
-	if len(choiceSplit) > 1 {
-		payload = strings.TrimSpace(strings.Join(choiceSplit[1:], " "))
-	}
-
-	return &Argument{
-		RawCommand: choiceSplit[0],
-		Payload:    payload,
-	}
-}
-
-func (v *StdoutView) getTerminalWidth() int {
-	cmd := exec.Command("stty", "size")
-	cmd.Stdin = os.Stdin
-	out, err := cmd.Output()
-	width, err := strconv.Atoi(strings.TrimSuffix(strings.Split(string(out), " ")[1], "\n"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return width
 }
 
 func New(reader *bufio.Reader, writer io.Writer) *StdoutView {

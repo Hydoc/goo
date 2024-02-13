@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"slices"
 )
@@ -91,31 +90,18 @@ func (list *TodoList) SaveToFile() {
 	_ = os.WriteFile(list.Filename, encoded, 0644)
 }
 
-func (list *TodoList) String() string {
-	out := ""
-	for i, todo := range list.Items {
-		if todo.IsDone {
-			out += fmt.Sprintf("%d [x] %s", todo.Id, todo.Label)
-		} else {
-			out += fmt.Sprintf("%d [ ] %s", todo.Id, todo.Label)
-		}
-
-		if i != len(list.Items)-1 {
-			out += "\r\n"
-		}
-	}
-
-	return out
-}
-
 func NewTodoListFromFile(filename string) (*TodoList, error) {
 	var items []*Todo
-	jsonBytes, _ := os.ReadFile(filename)
-
-	err := json.Unmarshal(jsonBytes, &items)
+	jsonBytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
+
+	err = json.Unmarshal(jsonBytes, &items)
+	if err != nil {
+		return nil, err
+	}
+
 	return &TodoList{
 		Filename: filename,
 		Items:    items,

@@ -7,13 +7,13 @@ import (
 	"testing"
 )
 
-func TestNewDeleteTodo(t *testing.T) {
+func TestNewToggleTodo(t *testing.T) {
 	tests := []struct {
 		name     string
 		todoList *internal.TodoList
 		id       int
 		err      error
-		want     *DeleteTodo
+		want     *ToggleTodo
 	}{
 		{
 			name: "create normally",
@@ -29,7 +29,7 @@ func TestNewDeleteTodo(t *testing.T) {
 			},
 			id:  1,
 			err: nil,
-			want: &DeleteTodo{
+			want: &ToggleTodo{
 				todoList: &internal.TodoList{
 					Filename: "",
 					Items: []*internal.Todo{
@@ -40,7 +40,7 @@ func TestNewDeleteTodo(t *testing.T) {
 						},
 					},
 				},
-				idToDelete: 1,
+				idToToggle: 1,
 			},
 		},
 		{
@@ -63,7 +63,7 @@ func TestNewDeleteTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := NewDeleteTodo(test.todoList, test.id)
+			got, err := NewToggleTodo(test.todoList, test.id)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -76,7 +76,7 @@ func TestNewDeleteTodo(t *testing.T) {
 	}
 }
 
-func TestDeleteTodo_Execute(t *testing.T) {
+func TestToggleTodo_Execute(t *testing.T) {
 	todoList := &internal.TodoList{
 		Filename: "",
 		Items: []*internal.Todo{
@@ -88,10 +88,10 @@ func TestDeleteTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := NewDeleteTodo(todoList, 1)
+	cmd, _ := NewToggleTodo(todoList, 1)
 	cmd.Execute()
 
-	if todoList.Has(1) {
-		t.Errorf("expected to delete the item with id %d", cmd.idToDelete)
+	if !todoList.Items[0].IsDone {
+		t.Error("expected todo at index 0 to be done")
 	}
 }

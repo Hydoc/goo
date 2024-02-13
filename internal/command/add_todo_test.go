@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestAddTodo_newAddTodo(t *testing.T) {
+func TestNewAddTodo(t *testing.T) {
 	todoList := &internal.TodoList{}
 	tests := []struct {
 		name    string
@@ -25,13 +25,13 @@ func TestAddTodo_newAddTodo(t *testing.T) {
 			name:    "not create due to missing payload",
 			payload: "",
 			want:    nil,
-			err:     errors.New(addTodoUsage),
+			err:     errors.New("empty todo is not allowed"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newAddTodo(todoList, test.payload)
+			got, err := NewAddTodo(todoList, test.payload)
 
 			if test.err != nil && !reflect.DeepEqual(err, test.err) {
 				t.Errorf("want error %#v, got %#v", test.err, err)
@@ -58,7 +58,7 @@ func TestAddTodo_Execute(t *testing.T) {
 	}
 
 	payload := "new task"
-	cmd, _ := newAddTodo(todoList, payload)
+	cmd, _ := NewAddTodo(todoList, payload)
 
 	cmd.Execute()
 
@@ -77,32 +77,5 @@ func TestAddTodo_Execute(t *testing.T) {
 
 	if addedTodo.IsDone {
 		t.Errorf("expected todo not to be done")
-	}
-
-	if !reflect.DeepEqual(cmd.previousTodoListItems, previousTodoList) {
-		t.Errorf("want previous todo list item %v, got %v", previousTodoList, cmd.previousTodoListItems)
-	}
-}
-
-func TestAddTodo_Undo(t *testing.T) {
-	previousTodoList := []*internal.Todo{
-		{
-			Id:     1,
-			Label:  "Test",
-			IsDone: false,
-		},
-	}
-	todoList := &internal.TodoList{
-		Filename: "",
-		Items:    previousTodoList,
-	}
-
-	payload := "new task"
-	cmd, _ := newAddTodo(todoList, payload)
-	cmd.Execute()
-	cmd.Undo()
-
-	if !reflect.DeepEqual(todoList.Items, previousTodoList) {
-		t.Errorf("want list %v, got %v", previousTodoList, todoList.Items)
 	}
 }

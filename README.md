@@ -9,15 +9,21 @@ Example
 ```shell
 goo -f path/to/a/file.json --list
 ```
+Or using the default file (`~/.goo.json`)
+```shell
+goo --add Hello World!
+```
 
 **Notes**
 1. The file has to be json
 2. If the file does not exist it gets created
-3. The default file is `~/.goo.json`
 
 ## Installation
 **Using go**
-````shell
+```shell
 go install github.com/Hydoc/goo@latest
-````
+```
 **Note** Don't forget to add the $HOME/go/bin to your $PATH
+```shell
+export PATH=$PATH:$HOME/go/bin && goo -a I did it!
+```

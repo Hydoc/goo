@@ -1,46 +1,26 @@
 package command
 
 import (
-	"errors"
+	"fmt"
 	"github.com/Hydoc/goo/internal"
-	"strconv"
-)
-
-var ToggleTodoAliases = []string{"t"}
-
-const (
-	ToggleTodoAbbr  = "toggle"
-	ToggleTodoDesc  = "Toggle the done state of a todo"
-	toggleTodoUsage = "use the command like so: toggle <id of the todo>"
-	nothingToToggle = "nothing to toggle"
 )
 
 type ToggleTodo struct {
-	todoList       *internal.TodoList
-	todoIdToToggle int
+	todoList   *internal.TodoList
+	idToToggle int
 }
 
 func (cmd *ToggleTodo) Execute() {
-	cmd.todoList.Toggle(cmd.todoIdToToggle)
+	cmd.todoList.Toggle(cmd.idToToggle)
 }
 
-func (cmd *ToggleTodo) Undo() {
-	cmd.todoList.Toggle(cmd.todoIdToToggle)
-}
-
-func newToggleTodo(todoList *internal.TodoList, payload string) (*ToggleTodo, error) {
-	id, err := strconv.Atoi(payload)
-
-	if err != nil {
-		return nil, errors.New(toggleTodoUsage)
-	}
-
+func NewToggleTodo(todoList *internal.TodoList, id int) (*ToggleTodo, error) {
 	if !todoList.Has(id) {
-		return nil, errors.New(nothingToToggle)
+		return nil, fmt.Errorf("there is no todo with id %d", id)
 	}
 
 	return &ToggleTodo{
-		todoList:       todoList,
-		todoIdToToggle: id,
+		todoList:   todoList,
+		idToToggle: id,
 	}, nil
 }

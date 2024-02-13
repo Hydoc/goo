@@ -7,65 +7,47 @@ import (
 )
 
 type Controller struct {
-	view      *view.StdoutView
-	todoList  *internal.TodoList
-	parser    *command.Parser
-	undoStack *command.UndoStack
-	factory   *command.Factory
+	view     *view.StdoutView
+	todoList *internal.TodoList
 }
 
-func (ctr *Controller) Run() {
-	var nextError error
-	doClearScreen := true
-	doQuit := false
-	for !doQuit {
-		if doClearScreen {
-			ctr.view.ClearScreen()
-		}
-		if ctr.todoList.HasItems() {
-			ctr.view.RenderLine("Your list:")
-			ctr.view.RenderLine(ctr.todoList.String())
-		} else {
-			ctr.view.RenderLine("You currently have no todos")
-			ctr.view.RenderLine("Type 'help' for an overview of all commands")
-		}
-		if nextError != nil {
-			ctr.view.RenderLine(nextError.Error())
-			nextError = nil
-		}
-		argument := ctr.view.Prompt()
-		parsedCmd, err := ctr.parser.Parse(argument)
+func (ctr *Controller) Handle(list *bool, toggle *int, add *bool, doDelete *int, edit *bool, args string) (int, error) {
+	defer ctr.todoList.SaveToFile()
+
+	switch {
+	case *list:
+		ctr.view.RenderList(ctr.todoList)
+	case *add:
+		cmd, err := command.NewAddTodo(ctr.todoList, args)
 		if err != nil {
-			nextError = err
-			doClearScreen = true
-			continue
-		}
-		cmd, err := ctr.factory.Fabricate(parsedCmd, ctr.todoList, ctr.undoStack, ctr.view)
-		if err != nil {
-			nextError = err
-			doClearScreen = true
-			continue
+			return 1, err
 		}
 		cmd.Execute()
-		switch cmd.(interface{}).(type) {
-		case *command.Help:
-			// do not clear screen when command is help otherwise it vanishes
-			doClearScreen = false
-		case *command.Quit:
-			doQuit = true
+	case *edit:
+		cmd, err := command.NewEditTodo(ctr.todoList, args)
+		if err != nil {
+			return 1, err
 		}
-		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
-			ctr.undoStack.Push(undoable)
+		cmd.Execute()
+	case *doDelete > 0:
+		cmd, err := command.NewDeleteTodo(ctr.todoList, *doDelete)
+		if err != nil {
+			return 1, err
 		}
+		cmd.Execute()
+	case *toggle > 0:
+		cmd, err := command.NewToggleTodo(ctr.todoList, *toggle)
+		if err != nil {
+			return 1, err
+		}
+		cmd.Execute()
 	}
+	return 0, nil
 }
 
-func New(view *view.StdoutView, list *internal.TodoList, parser *command.Parser, undoStack *command.UndoStack, factory *command.Factory) *Controller {
+func New(view *view.StdoutView, todoList *internal.TodoList) *Controller {
 	return &Controller{
-		view:      view,
-		todoList:  list,
-		parser:    parser,
-		undoStack: undoStack,
-		factory:   factory,
+		view:     view,
+		todoList: todoList,
 	}
 }

@@ -25,6 +25,20 @@ func (list *TodoList) Find(id int) *Todo {
 	return nil
 }
 
+func (list *TodoList) LenOfLongestTodo() int {
+	if !list.HasItems() {
+		return 0
+	}
+
+	current := len(list.Items[0].Label)
+	for _, todo := range list.Items {
+		if len(todo.Label) > current {
+			current = len(todo.Label)
+		}
+	}
+	return current
+}
+
 func (list *TodoList) Edit(id int, label string) {
 	for _, todo := range list.Items {
 		if todo.Id == id {

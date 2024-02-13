@@ -23,8 +23,7 @@ func (ctr *Controller) Run() {
 			ctr.view.ClearScreen()
 		}
 		if ctr.todoList.HasItems() {
-			ctr.view.RenderLine("Your list:")
-			ctr.view.RenderLine(ctr.todoList.String())
+			ctr.view.RenderList(ctr.todoList)
 		} else {
 			ctr.view.RenderLine("You currently have no todos")
 			ctr.view.RenderLine("Type 'help' for an overview of all commands")
@@ -53,6 +52,8 @@ func (ctr *Controller) Run() {
 			doClearScreen = false
 		case *command.Quit:
 			doQuit = true
+		default:
+			doClearScreen = true
 		}
 		if undoable, isUndoable := cmd.(command.UndoableCommand); isUndoable {
 			ctr.undoStack.Push(undoable)

@@ -40,7 +40,7 @@ func (v *StdoutView) RenderList(todoList *internal.TodoList) {
 
 	idStr := textWithMarginRight(idMarginRight, "ID")
 	labelStr := textWithMarginLeft(idMarginRight, textWithMarginRight(longestEntry, "TASK"))
-	statusStr := textWithMarginLeft(longestEntry-len(labelStr)+offsetStatus, "STATUS")
+	statusStr := textWithMarginLeft(len(labelStr)-longestEntry+offsetStatus, "STATUS")
 
 	headline := fmt.Sprintf("%s%s%s", idStr, labelStr, statusStr)
 	v.RenderLine(headline)

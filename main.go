@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"github.com/Hydoc/goo/internal"
@@ -41,7 +40,7 @@ const (
 var filename string
 
 func main() {
-	v := view.New(bufio.NewReader(os.Stdin), os.Stdout)
+	v := view.New(os.Stdout)
 	file := flag.String("file", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 	flag.StringVar(file, "f", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 

@@ -1,7 +1,6 @@
 package view
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/Hydoc/goo/internal"
 	"io"
@@ -14,7 +13,6 @@ const (
 )
 
 type StdoutView struct {
-	reader *bufio.Reader
 	writer io.Writer
 }
 
@@ -65,9 +63,8 @@ func (v *StdoutView) toColor(str, color string) string {
 	}
 }
 
-func New(reader *bufio.Reader, writer io.Writer) *StdoutView {
+func New(writer io.Writer) *StdoutView {
 	return &StdoutView{
-		reader: reader,
 		writer: writer,
 	}
 }

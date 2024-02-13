@@ -63,7 +63,7 @@ func TestNewToggleTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := NewToggleTodo(test.todoList, test.id)
+			got, err := newToggleTodo(test.todoList, test.id)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -88,7 +88,7 @@ func TestToggleTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := NewToggleTodo(todoList, 1)
+	cmd, _ := newToggleTodo(todoList, 1)
 	cmd.Execute()
 
 	if !todoList.Items[0].IsDone {

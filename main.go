@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/command"
 	"github.com/Hydoc/goo/internal/controller"
 	"github.com/Hydoc/goo/internal/view"
 	"os"
@@ -91,7 +92,8 @@ func main() {
 	}
 
 	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
-	ctr := controller.New(v, todoList)
+	commandFactory := command.NewFactory()
+	ctr := controller.New(v, todoList, commandFactory)
 	code, err := ctr.Handle(list, toggle, add, doDelete, edit, args)
 	if err != nil {
 		v.RenderLine(err.Error())

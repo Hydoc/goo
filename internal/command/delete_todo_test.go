@@ -63,7 +63,7 @@ func TestNewDeleteTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := NewDeleteTodo(test.todoList, test.id)
+			got, err := newDeleteTodo(test.todoList, test.id)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -88,7 +88,7 @@ func TestDeleteTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := NewDeleteTodo(todoList, 1)
+	cmd, _ := newDeleteTodo(todoList, 1)
 	cmd.Execute()
 
 	if todoList.Has(1) {

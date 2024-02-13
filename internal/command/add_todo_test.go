@@ -31,7 +31,7 @@ func TestNewAddTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := NewAddTodo(todoList, test.payload)
+			got, err := newAddTodo(todoList, test.payload)
 
 			if test.err != nil && !reflect.DeepEqual(err, test.err) {
 				t.Errorf("want error %#v, got %#v", test.err, err)
@@ -58,7 +58,7 @@ func TestAddTodo_Execute(t *testing.T) {
 	}
 
 	payload := "new task"
-	cmd, _ := NewAddTodo(todoList, payload)
+	cmd, _ := newAddTodo(todoList, payload)
 
 	cmd.Execute()
 

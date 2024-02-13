@@ -20,7 +20,7 @@ func (cmd *EditTodo) Execute() {
 	cmd.todoList.Edit(cmd.idToEdit, newLabel)
 }
 
-func NewEditTodo(todoList *internal.TodoList, payload string) (*EditTodo, error) {
+func newEditTodo(todoList *internal.TodoList, payload string) (*EditTodo, error) {
 	splitBySpace := strings.Split(payload, " ")
 	id, err := strconv.Atoi(splitBySpace[0])
 

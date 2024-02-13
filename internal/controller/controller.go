@@ -9,6 +9,7 @@ import (
 type Controller struct {
 	view     *view.StdoutView
 	todoList *internal.TodoList
+	factory  *command.Factory
 }
 
 func (ctr *Controller) Handle(list *bool, toggle *int, add *bool, doDelete *int, edit *bool, args string) (int, error) {
@@ -17,26 +18,8 @@ func (ctr *Controller) Handle(list *bool, toggle *int, add *bool, doDelete *int,
 	switch {
 	case *list:
 		ctr.view.RenderList(ctr.todoList)
-	case *add:
-		cmd, err := command.NewAddTodo(ctr.todoList, args)
-		if err != nil {
-			return 1, err
-		}
-		cmd.Execute()
-	case *edit:
-		cmd, err := command.NewEditTodo(ctr.todoList, args)
-		if err != nil {
-			return 1, err
-		}
-		cmd.Execute()
-	case *doDelete > 0:
-		cmd, err := command.NewDeleteTodo(ctr.todoList, *doDelete)
-		if err != nil {
-			return 1, err
-		}
-		cmd.Execute()
-	case *toggle > 0:
-		cmd, err := command.NewToggleTodo(ctr.todoList, *toggle)
+	default:
+		cmd, err := ctr.factory.Fabricate(ctr.todoList, toggle, add, doDelete, edit, args)
 		if err != nil {
 			return 1, err
 		}
@@ -45,9 +28,10 @@ func (ctr *Controller) Handle(list *bool, toggle *int, add *bool, doDelete *int,
 	return 0, nil
 }
 
-func New(view *view.StdoutView, todoList *internal.TodoList) *Controller {
+func New(view *view.StdoutView, todoList *internal.TodoList, factory *command.Factory) *Controller {
 	return &Controller{
 		view:     view,
 		todoList: todoList,
+		factory:  factory,
 	}
 }

@@ -14,7 +14,7 @@ func (cmd *AddTodo) Execute() {
 	cmd.todoList.Add(internal.NewTodo(cmd.todoToAdd, cmd.todoList.NextId()))
 }
 
-func NewAddTodo(todoList *internal.TodoList, payload string) (*AddTodo, error) {
+func newAddTodo(todoList *internal.TodoList, payload string) (*AddTodo, error) {
 	if len(payload) == 0 {
 		return nil, errors.New("empty todo is not allowed")
 	}

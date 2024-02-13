@@ -96,7 +96,7 @@ func TestNewEditTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := NewEditTodo(test.todoList, test.payload)
+			got, err := newEditTodo(test.todoList, test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -123,7 +123,7 @@ func TestEditTodo_Execute(t *testing.T) {
 	payload := "1 Bla {} bla"
 	wantLabel := "Bla Test bla"
 
-	cmd, _ := NewEditTodo(todoList, payload)
+	cmd, _ := newEditTodo(todoList, payload)
 	cmd.Execute()
 
 	editedItem := todoList.Items[0]

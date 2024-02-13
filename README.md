@@ -7,21 +7,17 @@ A simple CLI todo list written in Go that supports different files.
 
 Example
 ```shell
-goo -file path/to/a/file.json
+goo -f path/to/a/file.json --list
 ```
 
 **Notes**
 1. The file has to be json
 2. If the file does not exist it gets created
+3. The default file is `~/.goo.json`
 
-
-Saving only happens when using the `quit` command.
-
-The following commands are currently supported:
-1. `add`
-2. `delete`
-3. `edit`
-4. `toggle`
-5. `undo`
-6. `help`
-7. `quit`
+## Installation
+**Using go**
+````shell
+go install github.com/Hydoc/goo@latest
+````
+**Note** Don't forget to add the $HOME/go/bin to your $PATH

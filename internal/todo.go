@@ -15,8 +15,8 @@ func (t *Todo) DoneAsString() string {
 
 func NewTodo(label string, id int) *Todo {
 	return &Todo{
-		Id:     id,
-		Label:  label,
-		IsDone: false,
+		id,
+		label,
+		false,
 	}
 }

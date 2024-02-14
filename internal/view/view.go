@@ -66,7 +66,5 @@ func (v *StdoutView) toColor(str, color string) string {
 }
 
 func New(writer io.Writer) *StdoutView {
-	return &StdoutView{
-		writer: writer,
-	}
+	return &StdoutView{writer}
 }

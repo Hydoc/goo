@@ -38,9 +38,5 @@ func newEditTodo(todoList *internal.TodoList, payload string) (*EditTodo, error)
 		return nil, errors.New("empty todo is not allowed")
 	}
 
-	return &EditTodo{
-		todoList: todoList,
-		idToEdit: id,
-		newLabel: newLabel,
-	}, nil
+	return &EditTodo{todoList, id, newLabel}, nil
 }

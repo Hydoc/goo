@@ -483,3 +483,20 @@ func TestTodoList_SaveToFile(t *testing.T) {
 		t.Errorf("expected saved todo list item at index 0 to have id '1', got %v", todoList.Items[0].Id)
 	}
 }
+
+func TestTodoList_Clear(t *testing.T) {
+	todoList := &TodoList{
+		Filename: "test.json",
+		Items: []*Todo{
+			NewTodo("Test", 1),
+			NewTodo("Another", 2),
+			NewTodo("Third", 3),
+		},
+	}
+
+	todoList.Clear()
+
+	if todoList.HasItems() {
+		t.Error("expected todolist to be empty")
+	}
+}

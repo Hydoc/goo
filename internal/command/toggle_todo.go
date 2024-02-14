@@ -19,8 +19,5 @@ func newToggleTodo(todoList *internal.TodoList, id int) (*ToggleTodo, error) {
 		return nil, fmt.Errorf("there is no todo with id %d", id)
 	}
 
-	return &ToggleTodo{
-		todoList:   todoList,
-		idToToggle: id,
-	}, nil
+	return &ToggleTodo{todoList, id}, nil
 }

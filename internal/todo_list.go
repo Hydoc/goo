@@ -90,6 +90,10 @@ func (list *TodoList) SaveToFile() {
 	_ = os.WriteFile(list.Filename, encoded, 0644)
 }
 
+func (list *TodoList) Clear() {
+	list.Items = make([]*Todo, 0)
+}
+
 func NewTodoListFromFile(filename string) (*TodoList, error) {
 	var items []*Todo
 	jsonBytes, err := os.ReadFile(filename)

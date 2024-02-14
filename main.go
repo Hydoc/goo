@@ -35,7 +35,10 @@ const (
              e.g goo --edit 1 {} World!
 
   -a, --add
-        Add a new todo`
+        Add a new todo
+
+  --clear
+        Clear the whole list`
 )
 
 var filename string
@@ -59,6 +62,8 @@ func main() {
 
 	edit := flag.Bool("edit", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
 	flag.BoolVar(edit, "e", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
+
+	doClear := flag.Bool("clear", false, "")
 
 	flag.Usage = func() {
 		v.RenderLine(usage)
@@ -94,7 +99,7 @@ func main() {
 	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
 	commandFactory := command.NewFactory()
 	ctr := controller.New(v, todoList, commandFactory)
-	code, err := ctr.Handle(list, toggle, add, doDelete, edit, args)
+	code, err := ctr.Handle(list, toggle, add, doDelete, edit, doClear, args)
 	if err != nil {
 		v.RenderLine(err.Error())
 	}

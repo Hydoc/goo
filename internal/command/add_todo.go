@@ -19,8 +19,5 @@ func newAddTodo(todoList *internal.TodoList, payload string) (*AddTodo, error) {
 		return nil, errors.New("empty todo is not allowed")
 	}
 
-	return &AddTodo{
-		todoList:  todoList,
-		todoToAdd: payload,
-	}, nil
+	return &AddTodo{todoList, payload}, nil
 }

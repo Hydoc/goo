@@ -19,8 +19,5 @@ func newDeleteTodo(todoList *internal.TodoList, id int) (*DeleteTodo, error) {
 		return nil, fmt.Errorf("there is no todo with id %d", id)
 	}
 
-	return &DeleteTodo{
-		todoList:   todoList,
-		idToDelete: id,
-	}, nil
+	return &DeleteTodo{todoList, id}, nil
 }

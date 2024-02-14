@@ -6,6 +6,13 @@ type Todo struct {
 	IsDone bool   `json:"isDone"`
 }
 
+func (t *Todo) DoneAsString() string {
+	if t.IsDone {
+		return "✓"
+	}
+	return "○"
+}
+
 func NewTodo(label string, id int) *Todo {
 	return &Todo{
 		Id:     id,

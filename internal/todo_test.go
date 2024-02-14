@@ -17,3 +17,39 @@ func TestNewTodo(t *testing.T) {
 		t.Error("expected todo not to be done")
 	}
 }
+
+func TestTodo_DoneAsString(t *testing.T) {
+	tests := []struct {
+		name string
+		want string
+		todo *Todo
+	}{
+		{
+			name: "done = false",
+			want: "○",
+			todo: &Todo{
+				Id:     1,
+				Label:  "Test",
+				IsDone: false,
+			},
+		},
+		{
+			name: "done = true",
+			want: "✓",
+			todo: &Todo{
+				Id:     1,
+				Label:  "Test",
+				IsDone: true,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todo.DoneAsString()
+			if got != test.want {
+				t.Errorf("want %s, got %s", test.want, got)
+			}
+		})
+	}
+}

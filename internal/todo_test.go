@@ -53,3 +53,41 @@ func TestTodo_DoneAsString(t *testing.T) {
 		})
 	}
 }
+
+func TestTodo_compare(t *testing.T) {
+	tests := []struct {
+		name  string
+		want  int
+		todo  *Todo
+		other *Todo
+	}{
+		{
+			name:  "a is done, b is not",
+			want:  -1,
+			todo:  &Todo{1, "Test", true},
+			other: &Todo{2, "Test", false},
+		},
+		{
+			name:  "both are done",
+			want:  1,
+			todo:  &Todo{2, "Test", true},
+			other: &Todo{1, "Test", true},
+		},
+		{
+			name:  "b is done, a is not",
+			want:  -1,
+			todo:  &Todo{1, "Test", false},
+			other: &Todo{2, "Test", true},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todo.compare(test.other)
+
+			if got != test.want {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}

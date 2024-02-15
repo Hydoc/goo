@@ -12,12 +12,12 @@ type Controller struct {
 	factory  *command.Factory
 }
 
-func (ctr *Controller) Handle(list *bool, toggle *int, add *bool, doDelete *int, edit *bool, doClear *bool, args string) (int, error) {
+func (ctr *Controller) Handle(list *bool, toggle int, add bool, doDelete int, edit bool, doClear bool, args string) (int, error) {
 	defer ctr.todoList.SaveToFile()
 
 	switch {
 	case *list:
-		ctr.view.RenderList(ctr.todoList)
+		ctr.view.RenderList(ctr.todoList.SortedByIdAndState())
 	default:
 		cmd, err := ctr.factory.Fabricate(ctr.todoList, toggle, add, doDelete, edit, doClear, args)
 		if err != nil {

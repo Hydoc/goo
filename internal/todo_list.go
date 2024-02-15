@@ -77,6 +77,18 @@ func (list *TodoList) Toggle(id int) {
 	}
 }
 
+func (list *TodoList) SortedByIdAndState() *TodoList {
+	itemsCopy := make([]*Todo, len(list.Items))
+	copy(itemsCopy, list.Items)
+	slices.SortFunc(itemsCopy, func(a, b *Todo) int {
+		return a.compare(b)
+	})
+	return &TodoList{
+		Filename: list.Filename,
+		Items:    itemsCopy,
+	}
+}
+
 func (list *TodoList) NextId() int {
 	if len(list.Items) == 0 {
 		return 1

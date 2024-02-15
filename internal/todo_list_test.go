@@ -484,6 +484,107 @@ func TestTodoList_SaveToFile(t *testing.T) {
 	}
 }
 
+func TestTodoList_SortedByIdAndState(t *testing.T) {
+	tests := []struct {
+		name     string
+		todoList *TodoList
+		want     *TodoList
+	}{
+		{
+			name: "should be sorted by id and done",
+			todoList: &TodoList{
+				Items: []*Todo{
+					{
+						Id:     1,
+						Label:  "",
+						IsDone: true,
+					},
+					{
+						Id:     2,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     3,
+						Label:  "",
+						IsDone: true,
+					},
+				},
+			},
+			want: &TodoList{
+				Items: []*Todo{
+					{
+						Id:     2,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     1,
+						Label:  "",
+						IsDone: true,
+					},
+					{
+						Id:     3,
+						Label:  "",
+						IsDone: true,
+					},
+				},
+			},
+		},
+		{
+			name: "should be sorted by id when no todo is done",
+			todoList: &TodoList{
+				Items: []*Todo{
+					{
+						Id:     3,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     2,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     1,
+						Label:  "",
+						IsDone: false,
+					},
+				},
+			},
+			want: &TodoList{
+				Items: []*Todo{
+					{
+						Id:     1,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     2,
+						Label:  "",
+						IsDone: false,
+					},
+					{
+						Id:     3,
+						Label:  "",
+						IsDone: false,
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todoList.SortedByIdAndState()
+
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("want order %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
 func TestTodoList_Clear(t *testing.T) {
 	todoList := &TodoList{
 		Filename: "test.json",

@@ -99,12 +99,12 @@ func main() {
 	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
 	commandFactory := command.NewFactory()
 	ctr := controller.New(v, todoList, commandFactory)
-	code, err := ctr.Handle(list, toggle, add, doDelete, edit, doClear, args)
+	code, err := ctr.Handle(list, *toggle, *add, *doDelete, *edit, *doClear, args)
 	if err != nil {
 		v.RenderLine(err.Error())
 	}
 	if code == 0 && !*list {
-		v.RenderList(todoList)
+		v.RenderList(todoList.SortedByIdAndState())
 	}
 	os.Exit(code)
 }

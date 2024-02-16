@@ -10,6 +10,7 @@ import (
 
 type View interface {
 	RenderList(todoList *model.TodoList)
+	RenderLine(str string)
 }
 
 type StdoutView struct {

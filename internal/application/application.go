@@ -53,8 +53,7 @@ func createFileIfNotExists() error {
 	return nil
 }
 
-func Main() {
-	v := view.New(os.Stdout)
+func Main(view view.View, userHomeDir string) {
 	file := flag.String("file", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 	flag.StringVar(file, "f", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 
@@ -76,7 +75,7 @@ func Main() {
 	doClear := flag.Bool("clear", false, "")
 
 	flag.Usage = func() {
-		v.RenderLine(usage)
+		view.RenderLine(usage)
 	}
 	flag.Parse()
 
@@ -85,36 +84,30 @@ func Main() {
 	}
 
 	if len(filename) == 0 {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			v.RenderLine(err.Error())
-			os.Exit(1)
-		}
-		filename = filepath.Join(home, defaultFileName)
+		filename = filepath.Join(userHomeDir, defaultFileName)
 	}
 
 	err := createFileIfNotExists()
 
 	if err != nil {
-		v.RenderLine(err.Error())
-		os.Exit(1)
+		view.RenderLine(err.Error())
+		return
 	}
 
 	todoList, err := model.NewTodoListFromFile(filename)
 	if err != nil {
-		v.RenderLine(err.Error())
-		os.Exit(1)
+		view.RenderLine(err.Error())
+		return
 	}
 
 	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
 	commandFactory := command.NewFactory()
-	ctr := controller.New(v, todoList, commandFactory)
+	ctr := controller.New(view, todoList, commandFactory)
 	code, err := ctr.Handle(*list, *toggle, *add, *doDelete, *edit, *doClear, args)
 	if err != nil {
-		v.RenderLine(err.Error())
+		view.RenderLine(err.Error())
 	}
 	if code == 0 && !*list {
-		v.RenderList(todoList)
+		view.RenderList(todoList)
 	}
-	os.Exit(code)
 }

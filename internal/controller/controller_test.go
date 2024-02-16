@@ -32,14 +32,19 @@ func setUpFile(t *testing.T, filename string, content interface{}) func() {
 
 type DummyView struct {
 	RenderListCalls int
+	RenderLineCalls int
 }
 
 func (d *DummyView) RenderList(_ *model.TodoList) {
 	d.RenderListCalls++
 }
 
+func (d *DummyView) RenderLine(_ string) {
+	d.RenderLineCalls++
+}
+
 func newDummyView() *DummyView {
-	return &DummyView{0}
+	return &DummyView{0, 0}
 }
 
 func TestController_Handle(t *testing.T) {

@@ -8,16 +8,12 @@ import (
 	"strings"
 )
 
-const (
-	colorGray = "gray"
-)
+type View interface {
+	RenderList(todoList *internal.TodoList)
+}
 
 type StdoutView struct {
 	writer io.Writer
-}
-
-func (v *StdoutView) Render(str string) {
-	fmt.Fprint(v.writer, str)
 }
 
 func (v *StdoutView) RenderLine(str string) {
@@ -25,6 +21,7 @@ func (v *StdoutView) RenderLine(str string) {
 }
 
 func (v *StdoutView) RenderList(todoList *internal.TodoList) {
+	todoList = todoList.SortedByIdAndState()
 	idMarginRight := 4
 	offsetStatus := 8
 	offsetCheck := 7
@@ -44,7 +41,7 @@ func (v *StdoutView) RenderList(todoList *internal.TodoList) {
 		todoStr := fmt.Sprintf("%s%s%s", todoIdStr, todoLabelStr, todoStateStr)
 
 		if todo.IsDone {
-			v.RenderLine(v.toColor(todoStr, colorGray))
+			v.RenderLine(v.addGray(todoStr))
 		} else {
 			v.RenderLine(todoStr)
 		}
@@ -56,13 +53,8 @@ func (v *StdoutView) addMargin(left, right int, str string) string {
 	return fmt.Sprintf(fmt.Sprintf("%%%ds", left), rightMargin)
 }
 
-func (v *StdoutView) toColor(str, color string) string {
-	switch color {
-	case colorGray:
-		return fmt.Sprintf("\033[90m%s\033[0m", str)
-	default:
-		return str
-	}
+func (v *StdoutView) addGray(str string) string {
+	return fmt.Sprintf("\033[90m%s\033[0m", str)
 }
 
 func New(writer io.Writer) *StdoutView {

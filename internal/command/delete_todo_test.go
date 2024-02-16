@@ -2,7 +2,7 @@ package command
 
 import (
 	"errors"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
 )
@@ -10,16 +10,16 @@ import (
 func TestNewDeleteTodo(t *testing.T) {
 	tests := []struct {
 		name     string
-		todoList *internal.TodoList
+		todoList *model.TodoList
 		id       int
 		err      error
 		want     *DeleteTodo
 	}{
 		{
 			name: "create normally",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -30,9 +30,9 @@ func TestNewDeleteTodo(t *testing.T) {
 			id:  1,
 			err: nil,
 			want: &DeleteTodo{
-				todoList: &internal.TodoList{
+				todoList: &model.TodoList{
 					Filename: "",
-					Items: []*internal.Todo{
+					Items: []*model.Todo{
 						{
 							Id:     1,
 							Label:  "Test",
@@ -45,9 +45,9 @@ func TestNewDeleteTodo(t *testing.T) {
 		},
 		{
 			name: "not create when todo list does not have id in payload",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -77,9 +77,9 @@ func TestNewDeleteTodo(t *testing.T) {
 }
 
 func TestDeleteTodo_Execute(t *testing.T) {
-	todoList := &internal.TodoList{
+	todoList := &model.TodoList{
 		Filename: "",
-		Items: []*internal.Todo{
+		Items: []*model.Todo{
 			{
 				Id:     1,
 				Label:  "",

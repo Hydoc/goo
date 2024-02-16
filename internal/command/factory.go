@@ -1,10 +1,10 @@
 package command
 
-import "github.com/Hydoc/goo/internal"
+import "github.com/Hydoc/goo/internal/model"
 
 type Factory struct{}
 
-func (f *Factory) Fabricate(todoList *internal.TodoList, toggle int, add bool, doDelete int, edit bool, doClear bool, args string) (Command, error) {
+func (f *Factory) Fabricate(todoList *model.TodoList, toggle int, add bool, doDelete int, edit bool, doClear bool, args string) (Command, error) {
 	switch {
 	case edit:
 		return newEditTodo(todoList, args)

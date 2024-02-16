@@ -2,7 +2,7 @@ package command
 
 import (
 	"errors"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
 )
@@ -10,16 +10,16 @@ import (
 func TestNewEditTodo(t *testing.T) {
 	tests := []struct {
 		name     string
-		todoList *internal.TodoList
+		todoList *model.TodoList
 		payload  string
 		err      error
 		want     *EditTodo
 	}{
 		{
 			name: "create normally",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -30,9 +30,9 @@ func TestNewEditTodo(t *testing.T) {
 			payload: "1 Bla {} bla",
 			err:     nil,
 			want: &EditTodo{
-				todoList: &internal.TodoList{
+				todoList: &model.TodoList{
 					Filename: "",
-					Items: []*internal.Todo{
+					Items: []*model.Todo{
 						{
 							Id:     1,
 							Label:  "Test",
@@ -46,9 +46,9 @@ func TestNewEditTodo(t *testing.T) {
 		},
 		{
 			name: "not create due to invalid payload (missing id)",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -62,9 +62,9 @@ func TestNewEditTodo(t *testing.T) {
 		},
 		{
 			name: "not create due to invalid payload (missing label)",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -78,9 +78,9 @@ func TestNewEditTodo(t *testing.T) {
 		},
 		{
 			name: "not create when todo list does not have id in payload",
-			todoList: &internal.TodoList{
+			todoList: &model.TodoList{
 				Filename: "",
-				Items: []*internal.Todo{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -110,9 +110,9 @@ func TestNewEditTodo(t *testing.T) {
 }
 
 func TestEditTodo_Execute(t *testing.T) {
-	todoList := &internal.TodoList{
+	todoList := &model.TodoList{
 		Filename: "",
-		Items: []*internal.Todo{
+		Items: []*model.Todo{
 			{
 				Id:     1,
 				Label:  "Test",

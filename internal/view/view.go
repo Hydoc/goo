@@ -2,14 +2,14 @@ package view
 
 import (
 	"fmt"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"io"
 	"strconv"
 	"strings"
 )
 
 type View interface {
-	RenderList(todoList *internal.TodoList)
+	RenderList(todoList *model.TodoList)
 }
 
 type StdoutView struct {
@@ -20,7 +20,7 @@ func (v *StdoutView) RenderLine(str string) {
 	fmt.Fprintln(v.writer, str)
 }
 
-func (v *StdoutView) RenderList(todoList *internal.TodoList) {
+func (v *StdoutView) RenderList(todoList *model.TodoList) {
 	todoList = todoList.SortedByIdAndState()
 	idMarginRight := 4
 	offsetStatus := 8

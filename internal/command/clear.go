@@ -1,15 +1,15 @@
 package command
 
-import "github.com/Hydoc/goo/internal"
+import "github.com/Hydoc/goo/internal/model"
 
 type Clear struct {
-	todoList *internal.TodoList
+	todoList *model.TodoList
 }
 
 func (cmd *Clear) Execute() {
 	cmd.todoList.Clear()
 }
 
-func newClear(todoList *internal.TodoList) *Clear {
+func newClear(todoList *model.TodoList) *Clear {
 	return &Clear{todoList}
 }

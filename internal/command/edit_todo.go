@@ -3,13 +3,13 @@ package command
 import (
 	"errors"
 	"fmt"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"strconv"
 	"strings"
 )
 
 type EditTodo struct {
-	todoList *internal.TodoList
+	todoList *model.TodoList
 	idToEdit int
 	newLabel string
 }
@@ -20,7 +20,7 @@ func (cmd *EditTodo) Execute() {
 	cmd.todoList.Edit(cmd.idToEdit, newLabel)
 }
 
-func newEditTodo(todoList *internal.TodoList, payload string) (*EditTodo, error) {
+func newEditTodo(todoList *model.TodoList, payload string) (*EditTodo, error) {
 	splitBySpace := strings.Split(payload, " ")
 	id, err := strconv.Atoi(splitBySpace[0])
 

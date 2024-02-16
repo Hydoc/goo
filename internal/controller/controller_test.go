@@ -3,8 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Hydoc/goo/internal"
 	"github.com/Hydoc/goo/internal/command"
+	"github.com/Hydoc/goo/internal/model"
 	"os"
 	"reflect"
 	"testing"
@@ -34,7 +34,7 @@ type DummyView struct {
 	RenderListCalls int
 }
 
-func (d *DummyView) RenderList(_ *internal.TodoList) {
+func (d *DummyView) RenderList(_ *model.TodoList) {
 	d.RenderListCalls++
 }
 
@@ -44,9 +44,9 @@ func newDummyView() *DummyView {
 
 func TestController_Handle(t *testing.T) {
 	t.Run("call view.RenderList when list command triggers", func(t *testing.T) {
-		todoList := &internal.TodoList{
-			Items: []*internal.Todo{
-				internal.NewTodo("Hello", 1),
+		todoList := &model.TodoList{
+			Items: []*model.Todo{
+				model.NewTodo("Hello", 1),
 			},
 		}
 		dummyView := newDummyView()
@@ -68,9 +68,9 @@ func TestController_Handle(t *testing.T) {
 	})
 
 	t.Run("do nothing when no command was passed", func(t *testing.T) {
-		todoList := &internal.TodoList{
-			Items: []*internal.Todo{
-				internal.NewTodo("Hello", 1),
+		todoList := &model.TodoList{
+			Items: []*model.Todo{
+				model.NewTodo("Hello", 1),
 			},
 		}
 		ctr := New(newDummyView(), todoList, command.NewFactory())
@@ -96,8 +96,8 @@ func TestController_Handle(t *testing.T) {
 		args               string
 		err                error
 		wantCode           int
-		wantAfterExecution []*internal.Todo
-		todoItems          []*internal.Todo
+		wantAfterExecution []*model.Todo
+		todoItems          []*model.Todo
 	}{
 		{
 			name:     "handle toggle",
@@ -109,14 +109,14 @@ func TestController_Handle(t *testing.T) {
 			err:      nil,
 			args:     "",
 			wantCode: 0,
-			wantAfterExecution: []*internal.Todo{
+			wantAfterExecution: []*model.Todo{
 				{
 					Id:     1,
 					Label:  "Test",
 					IsDone: true,
 				},
 			},
-			todoItems: []*internal.Todo{
+			todoItems: []*model.Todo{
 				{
 					Id:     1,
 					Label:  "Test",
@@ -134,14 +134,14 @@ func TestController_Handle(t *testing.T) {
 			args:     "Hello World",
 			err:      nil,
 			wantCode: 0,
-			wantAfterExecution: []*internal.Todo{
+			wantAfterExecution: []*model.Todo{
 				{
 					Id:     1,
 					Label:  "Hello World",
 					IsDone: false,
 				},
 			},
-			todoItems: make([]*internal.Todo, 0),
+			todoItems: make([]*model.Todo, 0),
 		},
 		{
 			name:               "handle delete",
@@ -153,9 +153,9 @@ func TestController_Handle(t *testing.T) {
 			args:               "",
 			err:                nil,
 			wantCode:           0,
-			wantAfterExecution: make([]*internal.Todo, 0),
-			todoItems: []*internal.Todo{
-				internal.NewTodo("abc", 1),
+			wantAfterExecution: make([]*model.Todo, 0),
+			todoItems: []*model.Todo{
+				model.NewTodo("abc", 1),
 			},
 		},
 		{
@@ -168,15 +168,15 @@ func TestController_Handle(t *testing.T) {
 			args:     "1 Hello{}",
 			err:      nil,
 			wantCode: 0,
-			wantAfterExecution: []*internal.Todo{
+			wantAfterExecution: []*model.Todo{
 				{
 					Id:     1,
 					Label:  "Hello!",
 					IsDone: false,
 				},
 			},
-			todoItems: []*internal.Todo{
-				internal.NewTodo("!", 1),
+			todoItems: []*model.Todo{
+				model.NewTodo("!", 1),
 			},
 		},
 		{
@@ -189,11 +189,11 @@ func TestController_Handle(t *testing.T) {
 			args:               "",
 			err:                nil,
 			wantCode:           0,
-			wantAfterExecution: make([]*internal.Todo, 0),
-			todoItems: []*internal.Todo{
-				internal.NewTodo("ABC", 2),
-				internal.NewTodo("Hello", 3),
-				internal.NewTodo("World", 5),
+			wantAfterExecution: make([]*model.Todo, 0),
+			todoItems: []*model.Todo{
+				model.NewTodo("ABC", 2),
+				model.NewTodo("Hello", 3),
+				model.NewTodo("World", 5),
 			},
 		},
 		{
@@ -217,12 +217,12 @@ func TestController_Handle(t *testing.T) {
 			tearDown := setUpFile(t, filename, test.todoItems)
 			defer tearDown()
 
-			actualTodoList, _ := internal.NewTodoListFromFile(filename)
+			actualTodoList, _ := model.NewTodoListFromFile(filename)
 
 			ctr := New(newDummyView(), actualTodoList, command.NewFactory())
 			code, err := ctr.Handle(false, test.toggle, test.add, test.doDelete, test.edit, test.doClear, test.args)
 
-			writtenTodoList, _ := internal.NewTodoListFromFile(filename)
+			writtenTodoList, _ := model.NewTodoListFromFile(filename)
 
 			if !reflect.DeepEqual(writtenTodoList.Items, test.wantAfterExecution) {
 				t.Errorf("want written list %v, got %v", test.wantAfterExecution, writtenTodoList)

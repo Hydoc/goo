@@ -2,13 +2,13 @@ package command
 
 import (
 	"errors"
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
 )
 
 func TestNewAddTodo(t *testing.T) {
-	todoList := &internal.TodoList{}
+	todoList := &model.TodoList{}
 	tests := []struct {
 		name    string
 		payload string
@@ -45,14 +45,14 @@ func TestNewAddTodo(t *testing.T) {
 }
 
 func TestAddTodo_Execute(t *testing.T) {
-	previousTodoList := []*internal.Todo{
+	previousTodoList := []*model.Todo{
 		{
 			Id:     1,
 			Label:  "Test",
 			IsDone: false,
 		},
 	}
-	todoList := &internal.TodoList{
+	todoList := &model.TodoList{
 		Filename: "",
 		Items:    previousTodoList,
 	}

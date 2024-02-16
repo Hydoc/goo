@@ -1,12 +1,12 @@
 package command
 
 import (
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"testing"
 )
 
 func TestClear_Execute(t *testing.T) {
-	todoList := &internal.TodoList{Items: []*internal.Todo{
+	todoList := &model.TodoList{Items: []*model.Todo{
 		{
 			Id:     1,
 			Label:  "should be removed",

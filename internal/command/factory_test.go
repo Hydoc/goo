@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/Hydoc/goo/internal"
+	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
 )
@@ -11,7 +11,7 @@ func TestFactory_Fabricate(t *testing.T) {
 		name     string
 		want     Command
 		err      error
-		todoList *internal.TodoList
+		todoList *model.TodoList
 		toggle   int
 		add      bool
 		doDelete int
@@ -22,8 +22,8 @@ func TestFactory_Fabricate(t *testing.T) {
 		{
 			name: "edit",
 			want: &EditTodo{
-				todoList: &internal.TodoList{
-					Items: []*internal.Todo{
+				todoList: &model.TodoList{
+					Items: []*model.Todo{
 						{
 							Id:     1,
 							Label:  "Test",
@@ -35,8 +35,8 @@ func TestFactory_Fabricate(t *testing.T) {
 				newLabel: "ABC",
 			},
 			err: nil,
-			todoList: &internal.TodoList{
-				Items: []*internal.Todo{
+			todoList: &model.TodoList{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -55,8 +55,8 @@ func TestFactory_Fabricate(t *testing.T) {
 			name: "delete",
 			want: &DeleteTodo{
 				idToDelete: 1,
-				todoList: &internal.TodoList{
-					Items: []*internal.Todo{
+				todoList: &model.TodoList{
+					Items: []*model.Todo{
 						{
 							Id:     1,
 							Label:  "Test",
@@ -66,8 +66,8 @@ func TestFactory_Fabricate(t *testing.T) {
 				},
 			},
 			err: nil,
-			todoList: &internal.TodoList{
-				Items: []*internal.Todo{
+			todoList: &model.TodoList{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -86,8 +86,8 @@ func TestFactory_Fabricate(t *testing.T) {
 			name: "toggle",
 			want: &ToggleTodo{
 				idToToggle: 1,
-				todoList: &internal.TodoList{
-					Items: []*internal.Todo{
+				todoList: &model.TodoList{
+					Items: []*model.Todo{
 						{
 							Id:     1,
 							Label:  "Test",
@@ -97,8 +97,8 @@ func TestFactory_Fabricate(t *testing.T) {
 				},
 			},
 			err: nil,
-			todoList: &internal.TodoList{
-				Items: []*internal.Todo{
+			todoList: &model.TodoList{
+				Items: []*model.Todo{
 					{
 						Id:     1,
 						Label:  "Test",
@@ -117,10 +117,10 @@ func TestFactory_Fabricate(t *testing.T) {
 			name: "add",
 			want: &AddTodo{
 				todoToAdd: "Hello!",
-				todoList:  &internal.TodoList{Items: make([]*internal.Todo, 0)},
+				todoList:  &model.TodoList{Items: make([]*model.Todo, 0)},
 			},
 			err:      nil,
-			todoList: &internal.TodoList{Items: make([]*internal.Todo, 0)},
+			todoList: &model.TodoList{Items: make([]*model.Todo, 0)},
 			toggle:   0,
 			add:      true,
 			doDelete: 0,
@@ -130,9 +130,9 @@ func TestFactory_Fabricate(t *testing.T) {
 		},
 		{
 			name:     "clear",
-			want:     &Clear{&internal.TodoList{}},
+			want:     &Clear{&model.TodoList{}},
 			err:      nil,
-			todoList: &internal.TodoList{},
+			todoList: &model.TodoList{},
 			toggle:   0,
 			add:      false,
 			doDelete: 0,

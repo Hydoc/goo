@@ -11,9 +11,9 @@ func TestNewDeleteTodo(t *testing.T) {
 	tests := []struct {
 		name     string
 		todoList *model.TodoList
-		id       int
+		payload  string
 		err      error
-		want     *DeleteTodo
+		want     Command
 	}{
 		{
 			name: "create normally",
@@ -27,9 +27,10 @@ func TestNewDeleteTodo(t *testing.T) {
 					},
 				},
 			},
-			id:  1,
-			err: nil,
+			payload: "1",
+			err:     nil,
 			want: &DeleteTodo{
+				view: newDummyView(),
 				todoList: &model.TodoList{
 					Filename: "",
 					Items: []*model.Todo{
@@ -55,15 +56,15 @@ func TestNewDeleteTodo(t *testing.T) {
 					},
 				},
 			},
-			id:   56,
-			err:  errors.New("there is no todo with id 56"),
-			want: nil,
+			payload: "56",
+			err:     errors.New("there is no todo with id 56"),
+			want:    nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newDeleteTodo(test.todoList, test.id)
+			got, err := NewDeleteTodo(test.todoList, newDummyView(), test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -88,10 +89,10 @@ func TestDeleteTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := newDeleteTodo(todoList, 1)
+	cmd, _ := NewDeleteTodo(todoList, newDummyView(), "1")
 	cmd.Execute()
 
 	if todoList.Has(1) {
-		t.Errorf("expected to delete the item with id %d", cmd.idToDelete)
+		t.Errorf("expected to delete the item with id %d", cmd.(*DeleteTodo).idToDelete)
 	}
 }

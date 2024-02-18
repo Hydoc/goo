@@ -18,7 +18,7 @@ func TestClear_Execute(t *testing.T) {
 			IsDone: true,
 		},
 	}}
-	cmd := newClear(todoList)
+	cmd, _ := NewClear(todoList, newDummyView(), "")
 	cmd.Execute()
 
 	if todoList.HasItems() {

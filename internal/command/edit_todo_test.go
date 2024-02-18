@@ -13,7 +13,7 @@ func TestNewEditTodo(t *testing.T) {
 		todoList *model.TodoList
 		payload  string
 		err      error
-		want     *EditTodo
+		want     Command
 	}{
 		{
 			name: "create normally",
@@ -30,6 +30,7 @@ func TestNewEditTodo(t *testing.T) {
 			payload: "1 Bla {} bla",
 			err:     nil,
 			want: &EditTodo{
+				view: newDummyView(),
 				todoList: &model.TodoList{
 					Filename: "",
 					Items: []*model.Todo{
@@ -96,7 +97,7 @@ func TestNewEditTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newEditTodo(test.todoList, test.payload)
+			got, err := NewEditTodo(test.todoList, newDummyView(), test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -123,7 +124,7 @@ func TestEditTodo_Execute(t *testing.T) {
 	payload := "1 Bla {} bla"
 	wantLabel := "Bla Test bla"
 
-	cmd, _ := newEditTodo(todoList, payload)
+	cmd, _ := NewEditTodo(todoList, newDummyView(), payload)
 	cmd.Execute()
 
 	editedItem := todoList.Items[0]

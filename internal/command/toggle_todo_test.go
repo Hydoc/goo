@@ -11,9 +11,9 @@ func TestNewToggleTodo(t *testing.T) {
 	tests := []struct {
 		name     string
 		todoList *model.TodoList
-		id       int
+		payload  string
 		err      error
-		want     *ToggleTodo
+		want     Command
 	}{
 		{
 			name: "create normally",
@@ -27,9 +27,10 @@ func TestNewToggleTodo(t *testing.T) {
 					},
 				},
 			},
-			id:  1,
-			err: nil,
+			payload: "1",
+			err:     nil,
 			want: &ToggleTodo{
+				view: newDummyView(),
 				todoList: &model.TodoList{
 					Filename: "",
 					Items: []*model.Todo{
@@ -55,22 +56,22 @@ func TestNewToggleTodo(t *testing.T) {
 					},
 				},
 			},
-			id:   56,
-			err:  errors.New("there is no todo with id 56"),
-			want: nil,
+			payload: "56",
+			err:     errors.New("there is no todo with id 56"),
+			want:    nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newToggleTodo(test.todoList, test.id)
+			got, err := NewToggleTodo(test.todoList, newDummyView(), test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
 			}
 
 			if !reflect.DeepEqual(got, test.want) {
-				t.Errorf("want %v, got %v", test.want, got)
+				t.Errorf("want %#v, got %#v", test.want, got)
 			}
 		})
 	}
@@ -88,7 +89,7 @@ func TestToggleTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := newToggleTodo(todoList, 1)
+	cmd, _ := NewToggleTodo(todoList, newDummyView(), "1")
 	cmd.Execute()
 
 	if !todoList.Items[0].IsDone {

@@ -7,18 +7,35 @@ import (
 	"testing"
 )
 
+type dummyView struct {
+	RenderListCalls int
+	RenderLineCalls int
+}
+
+func (d *dummyView) RenderList(_ *model.TodoList) {
+	d.RenderListCalls++
+}
+
+func (d *dummyView) RenderLine(_ string) {
+	d.RenderLineCalls++
+}
+
+func newDummyView() *dummyView {
+	return &dummyView{0, 0}
+}
+
 func TestNewAddTodo(t *testing.T) {
 	todoList := &model.TodoList{}
 	tests := []struct {
 		name    string
 		payload string
-		want    *AddTodo
+		want    Command
 		err     error
 	}{
 		{
 			name:    "create normally",
 			payload: "test",
-			want:    &AddTodo{todoList: todoList, todoToAdd: "test"},
+			want:    &AddTodo{view: newDummyView(), todoList: todoList, todoToAdd: "test"},
 			err:     nil,
 		},
 		{
@@ -31,7 +48,7 @@ func TestNewAddTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newAddTodo(todoList, test.payload)
+			got, err := NewAddTodo(todoList, newDummyView(), test.payload)
 
 			if test.err != nil && !reflect.DeepEqual(err, test.err) {
 				t.Errorf("want error %#v, got %#v", test.err, err)
@@ -58,7 +75,7 @@ func TestAddTodo_Execute(t *testing.T) {
 	}
 
 	payload := "new task"
-	cmd, _ := newAddTodo(todoList, payload)
+	cmd, _ := NewAddTodo(todoList, newDummyView(), payload)
 
 	cmd.Execute()
 

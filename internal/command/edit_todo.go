@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Hydoc/goo/internal/model"
+	"github.com/Hydoc/goo/internal/view"
 	"strconv"
 	"strings"
 )
 
 type EditTodo struct {
 	todoList *model.TodoList
+	view     view.View
 	idToEdit int
 	newLabel string
 }
@@ -18,9 +20,11 @@ func (cmd *EditTodo) Execute() {
 	oldLabel := cmd.todoList.Find(cmd.idToEdit).Label
 	newLabel := strings.ReplaceAll(cmd.newLabel, "{}", oldLabel)
 	cmd.todoList.Edit(cmd.idToEdit, newLabel)
+	cmd.view.RenderList(cmd.todoList)
+	cmd.todoList.SaveToFile()
 }
 
-func newEditTodo(todoList *model.TodoList, payload string) (*EditTodo, error) {
+func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	splitBySpace := strings.Split(payload, " ")
 	id, err := strconv.Atoi(splitBySpace[0])
 
@@ -38,5 +42,5 @@ func newEditTodo(todoList *model.TodoList, payload string) (*EditTodo, error) {
 		return nil, errors.New("empty todo is not allowed")
 	}
 
-	return &EditTodo{todoList, id, newLabel}, nil
+	return &EditTodo{todoList, view, id, newLabel}, nil
 }

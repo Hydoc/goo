@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	application.Main(view.New(os.Stdout), os.UserHomeDir)
+	os.Exit(application.Main(view.New(os.Stdout), os.UserHomeDir))
 }

@@ -53,7 +53,7 @@ func createFileIfNotExists() error {
 	return nil
 }
 
-func Main(view view.View, userHomeDir string) {
+func Main(view view.View, userHomeDir func() (string, error)) {
 	file := flag.String("file", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 	flag.StringVar(file, "f", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 
@@ -84,7 +84,12 @@ func Main(view view.View, userHomeDir string) {
 	}
 
 	if len(filename) == 0 {
-		filename = filepath.Join(userHomeDir, defaultFileName)
+		homeDir, err := userHomeDir()
+		if err != nil {
+			view.RenderLine(err.Error())
+			return
+		}
+		filename = filepath.Join(homeDir, defaultFileName)
 	}
 
 	err := createFileIfNotExists()

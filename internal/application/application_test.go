@@ -33,13 +33,19 @@ func setUpFile(t *testing.T, filename string, content interface{}) func() {
 	}
 }
 
+func userHomeDirWith(homeDir string, err error) func() (string, error) {
+	return func() (string, error) {
+		return homeDir, err
+	}
+}
+
 func Test_Main(t *testing.T) {
 	t.Run("when file in home dir does not exist, it should get created", func(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 		userHomeDir := "./"
 		expectedFile := filepath.Join(userHomeDir, defaultFileName)
-		Main(v, userHomeDir)
+		Main(v, userHomeDirWith(userHomeDir, nil))
 
 		if _, err := os.Stat(expectedFile); errors.Is(err, os.ErrNotExist) {
 			t.Errorf("expected file %s to be created", expectedFile)
@@ -59,7 +65,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with add flag", flag.ExitOnError)
 		os.Args = []string{"without arguments should print the list"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK      STATUS\n--------------------\n"
 
@@ -80,7 +86,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with add flag", flag.ExitOnError)
 		os.Args = []string{"with add flag", "-a", "Hello World"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK         STATUS\n-----------------------\n1   Hello World    ○\n"
 
@@ -103,7 +109,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with delete flag", flag.ExitOnError)
 		os.Args = []string{"with delete flag", "-d", "1"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK      STATUS\n--------------------\n"
 
@@ -126,7 +132,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with toggle flag", flag.ExitOnError)
 		os.Args = []string{"with toggle flag", "-t", "1"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK               STATUS\n-----------------------------\n\x1b[90m1   should be toggled    ✓\x1b[0m\n"
 
@@ -149,7 +155,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with edit flag", flag.ExitOnError)
 		os.Args = []string{"with edit flag", "-e", "1 Hello there!"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK          STATUS\n------------------------\n1   Hello there!    ○\n"
 
@@ -173,7 +179,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with clear flag", flag.ExitOnError)
 		os.Args = []string{"with clear flag", "-clear"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK      STATUS\n--------------------\n"
 
@@ -196,7 +202,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with list flag", flag.ExitOnError)
 		os.Args = []string{"with list flag", "-l"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK    STATUS\n------------------\n1   Hi        ○\n"
 
@@ -220,7 +226,7 @@ func Test_Main(t *testing.T) {
 
 		flag.CommandLine = flag.NewFlagSet("with file flag", flag.ExitOnError)
 		os.Args = []string{"with file flag", "-f", fileToUse, "-l"}
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK                 STATUS\n-------------------------------\n1   I should be printed    ○\n"
 
@@ -240,7 +246,7 @@ func Test_Main(t *testing.T) {
 
 		os.Args = []string{"print error when file creating fails", "-f", fileToUse}
 		flag.CommandLine = flag.NewFlagSet("print error when file creating fails", flag.ExitOnError)
-		Main(v, "")
+		Main(v, userHomeDirWith("", nil))
 
 		want := "open /my-file.json: permission denied\n"
 
@@ -261,7 +267,7 @@ func Test_Main(t *testing.T) {
 
 		os.Args = []string{"correct flag.Usage"}
 		flag.CommandLine = flag.NewFlagSet("correct flag.Usage", flag.ExitOnError)
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 		flag.Usage()
 
 		want := "How to use goo\n  -h, --help\n    \tPrints this information\n\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  -l, --list\n        List all todos\n\n  -t, --toggle\n        Toggle the state of a todo by its id\n\n  -d, --delete\n        Delete a todo by its id\n\n  -e, --edit\n        Edit a todo by its id and a new label, use '{}' to insert the old value\n             e.g goo --edit 1 {} World!\n\n  -a, --add\n        Add a new todo\n\n  --clear\n        Clear the whole list\n"
@@ -284,7 +290,7 @@ func Test_Main(t *testing.T) {
 
 		os.Args = []string{"todolist creating fails", "-f", file}
 		flag.CommandLine = flag.NewFlagSet("todolist creating fails", flag.ExitOnError)
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "json: cannot unmarshal object into Go value of type []*model.Todo\n"
 
@@ -306,12 +312,31 @@ func Test_Main(t *testing.T) {
 
 		os.Args = []string{"todolist creating fails", "-a"}
 		flag.CommandLine = flag.NewFlagSet("todolist creating fails", flag.ExitOnError)
-		Main(v, "./")
+		Main(v, userHomeDirWith("./", nil))
 
 		want := "empty todo is not allowed\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
+		}
+	})
+
+	t.Run("print error when user home dir returns error", func(t *testing.T) {
+		filename = ""
+		oldArgs := os.Args
+		defer func() {
+			os.Args = oldArgs
+		}()
+		buffer := bytes.NewBuffer(make([]byte, 0))
+		v := view.New(buffer)
+		wantError := "directory not found\n"
+
+		os.Args = []string{"print error when user home dir fails"}
+		flag.CommandLine = flag.NewFlagSet("print error when user home dir fails", flag.ExitOnError)
+		Main(v, userHomeDirWith("./", errors.New("directory not found")))
+
+		if buffer.String() != wantError {
+			t.Errorf("want %#v, got %#v", wantError, buffer.String())
 		}
 	})
 }

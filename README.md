@@ -42,7 +42,7 @@ export PATH=$PATH:$HOME/go/bin && goo add I did it!
 
 ### Commands
 
-| Comamnd  | Description                                                                         | Example                  |
+| Command  | Description                                                                         | Example                  |
 |----------|-------------------------------------------------------------------------------------|--------------------------|
 | `add`    | Adds a new todo to the given list                                                   | `goo add Hello World!`   |
 | `rm`     | Removes a todo by its id                                                            | `goo rm 1`               |

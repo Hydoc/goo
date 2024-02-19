@@ -22,7 +22,7 @@ func (cmd *DeleteTodo) Execute() {
 func NewDeleteTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	id, err := strconv.Atoi(payload)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse %s to int", payload)
+		return nil, fmt.Errorf("%s is an invalid id", payload)
 	}
 
 	if !todoList.Has(id) {

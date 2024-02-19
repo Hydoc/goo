@@ -42,9 +42,14 @@ func userHomeDirWith(homeDir string, err error) func() (string, error) {
 func Test_Main(t *testing.T) {
 	t.Run("when file in home dir does not exist, it should get created", func(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
+		oldArgs := os.Args
+		defer func() {
+			os.Args = oldArgs
+		}()
 		v := view.New(buffer)
 		userHomeDir := "./"
 		expectedFile := filepath.Join(userHomeDir, defaultFileName)
+		os.Args = []string{"when file in home dir does not exist, it should get created"}
 		Main(v, userHomeDirWith(userHomeDir, nil))
 
 		if _, err := os.Stat(expectedFile); errors.Is(err, os.ErrNotExist) {
@@ -53,8 +58,8 @@ func Test_Main(t *testing.T) {
 		os.Remove(filename)
 	})
 
-	t.Run("without arguments should print the list", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", make([]*model.Todo, 0))
+	t.Run("without arguments should print usage", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -64,18 +69,18 @@ func Test_Main(t *testing.T) {
 		v := view.New(buffer)
 
 		flag.CommandLine = flag.NewFlagSet("with add flag", flag.ExitOnError)
-		os.Args = []string{"without arguments should print the list"}
+		os.Args = []string{"without arguments should print usage"}
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "ID  TASK      STATUS\n--------------------\n"
+		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
 		}
 	})
 
-	t.Run("with add flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", make([]*model.Todo, 0))
+	t.Run("with add subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -84,8 +89,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with add flag", flag.ExitOnError)
-		os.Args = []string{"with add flag", "-a", "Hello World"}
+		flag.CommandLine = flag.NewFlagSet("with add subcommand", flag.ExitOnError)
+		os.Args = []string{"with add subcommand", "add", "Hello World"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK         STATUS\n-----------------------\n1   Hello World    ○\n"
@@ -95,8 +100,8 @@ func Test_Main(t *testing.T) {
 		}
 	})
 
-	t.Run("with delete flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", []*model.Todo{
+	t.Run("with delete subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
 			model.NewTodo("should be deleted", 1),
 		})
 		oldArgs := os.Args
@@ -107,8 +112,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with delete flag", flag.ExitOnError)
-		os.Args = []string{"with delete flag", "-d", "1"}
+		flag.CommandLine = flag.NewFlagSet("with delete subcommand", flag.ExitOnError)
+		os.Args = []string{"with delete subcommand", "rm", "1"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK      STATUS\n--------------------\n"
@@ -118,8 +123,8 @@ func Test_Main(t *testing.T) {
 		}
 	})
 
-	t.Run("with toggle flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", []*model.Todo{
+	t.Run("with toggle subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
 			model.NewTodo("should be toggled", 1),
 		})
 		oldArgs := os.Args
@@ -130,8 +135,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with toggle flag", flag.ExitOnError)
-		os.Args = []string{"with toggle flag", "-t", "1"}
+		flag.CommandLine = flag.NewFlagSet("with toggle subcommand", flag.ExitOnError)
+		os.Args = []string{"with toggle subcommand", "toggle", "1"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK               STATUS\n-----------------------------\n\x1b[90m1   should be toggled    ✓\x1b[0m\n"
@@ -141,8 +146,8 @@ func Test_Main(t *testing.T) {
 		}
 	})
 
-	t.Run("with edit flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", []*model.Todo{
+	t.Run("with edit subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
 			model.NewTodo("should be changed", 1),
 		})
 		oldArgs := os.Args
@@ -153,8 +158,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with edit flag", flag.ExitOnError)
-		os.Args = []string{"with edit flag", "-e", "1 Hello there!"}
+		flag.CommandLine = flag.NewFlagSet("with edit subcommand", flag.ExitOnError)
+		os.Args = []string{"with edit subcommand", "edit", "1 Hello there!"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK          STATUS\n------------------------\n1   Hello there!    ○\n"
@@ -164,8 +169,8 @@ func Test_Main(t *testing.T) {
 		}
 	})
 
-	t.Run("with clear flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", []*model.Todo{
+	t.Run("with clear subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
 			model.NewTodo("should be deleted", 1),
 			model.NewTodo("should also be deleted", 2),
 		})
@@ -177,8 +182,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with clear flag", flag.ExitOnError)
-		os.Args = []string{"with clear flag", "-clear"}
+		flag.CommandLine = flag.NewFlagSet("with clear subcommand", flag.ExitOnError)
+		os.Args = []string{"with clear subcommand", "clear"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK      STATUS\n--------------------\n"
@@ -188,8 +193,8 @@ func Test_Main(t *testing.T) {
 		}
 	})
 
-	t.Run("with list flag", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", []*model.Todo{
+	t.Run("with list subcommand", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
 			model.NewTodo("Hi", 1),
 		})
 		oldArgs := os.Args
@@ -200,8 +205,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		flag.CommandLine = flag.NewFlagSet("with list flag", flag.ExitOnError)
-		os.Args = []string{"with list flag", "-l"}
+		flag.CommandLine = flag.NewFlagSet("with list subcommand", flag.ExitOnError)
+		os.Args = []string{"with list subcommand", "list"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK    STATUS\n------------------\n1   Hi        ○\n"
@@ -225,7 +230,7 @@ func Test_Main(t *testing.T) {
 		v := view.New(buffer)
 
 		flag.CommandLine = flag.NewFlagSet("with file flag", flag.ExitOnError)
-		os.Args = []string{"with file flag", "-f", fileToUse, "-l"}
+		os.Args = []string{"with file flag", "-f", fileToUse, "list"}
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "ID  TASK                 STATUS\n-------------------------------\n1   I should be printed    ○\n"
@@ -256,7 +261,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("correct flag.Usage", func(t *testing.T) {
-		tearDown := setUpFile(t, "./.goo.json", make([]*model.Todo, 0))
+		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -270,7 +275,7 @@ func Test_Main(t *testing.T) {
 		Main(v, userHomeDirWith("./", nil))
 		flag.Usage()
 
-		want := "How to use goo\n  -h, --help\n    \tPrints this information\n\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  -l, --list\n        List all todos\n\n  -t, --toggle\n        Toggle the state of a todo by its id\n\n  -d, --delete\n        Delete a todo by its id\n\n  -e, --edit\n        Edit a todo by its id and a new label, use '{}' to insert the old value\n             e.g goo --edit 1 {} World!\n\n  -a, --add\n        Add a new todo\n\n  --clear\n        Clear the whole list\n"
+		want := "open /my-file.json: permission denied\nHow to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
 
 		if !strings.Contains(buffer.String(), want) {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -278,8 +283,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("todolist creating fails", func(t *testing.T) {
-		file := "./.goo.json"
-		tearDown := setUpFile(t, file, map[string]int{})
+		tearDown := setUpFile(t, defaultFileName, map[string]int{})
 		defer tearDown()
 		oldArgs := os.Args
 		defer func() {
@@ -288,7 +292,7 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		os.Args = []string{"todolist creating fails", "-f", file}
+		os.Args = []string{"todolist creating fails", "-f", defaultFileName}
 		flag.CommandLine = flag.NewFlagSet("todolist creating fails", flag.ExitOnError)
 		Main(v, userHomeDirWith("./", nil))
 
@@ -300,8 +304,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("print error when controller returns error", func(t *testing.T) {
-		file := "./.goo.json"
-		tearDown := setUpFile(t, file, make([]*model.Todo, 0))
+		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
 		defer tearDown()
 		oldArgs := os.Args
 		defer func() {
@@ -310,8 +313,8 @@ func Test_Main(t *testing.T) {
 		buffer := bytes.NewBuffer(make([]byte, 0))
 		v := view.New(buffer)
 
-		os.Args = []string{"todolist creating fails", "-a"}
-		flag.CommandLine = flag.NewFlagSet("todolist creating fails", flag.ExitOnError)
+		os.Args = []string{"print error when controller returns error", "add"}
+		flag.CommandLine = flag.NewFlagSet("print error when controller returns error", flag.ExitOnError)
 		Main(v, userHomeDirWith("./", nil))
 
 		want := "empty todo is not allowed\n"
@@ -337,6 +340,27 @@ func Test_Main(t *testing.T) {
 
 		if buffer.String() != wantError {
 			t.Errorf("want %#v, got %#v", wantError, buffer.String())
+		}
+	})
+
+	t.Run("non existent subcommand should print usage", func(t *testing.T) {
+		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
+		defer tearDown()
+		oldArgs := os.Args
+		defer func() {
+			os.Args = oldArgs
+		}()
+		buffer := bytes.NewBuffer(make([]byte, 0))
+		v := view.New(buffer)
+
+		os.Args = []string{"non existent subcommand should print usage", "abc"}
+		flag.CommandLine = flag.NewFlagSet("non existent subcommand should print usage", flag.ExitOnError)
+		Main(v, userHomeDirWith("./", nil))
+
+		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
+
+		if buffer.String() != want {
+			t.Errorf("want %#v, got %#v", want, buffer.String())
 		}
 	})
 }

@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"github.com/Hydoc/goo/internal/model"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -62,6 +63,8 @@ func TestNewAddTodo(t *testing.T) {
 }
 
 func TestAddTodo_Execute(t *testing.T) {
+	file := "./test.json"
+	defer os.Remove(file)
 	previousTodoList := []*model.Todo{
 		{
 			Id:     1,
@@ -70,12 +73,13 @@ func TestAddTodo_Execute(t *testing.T) {
 		},
 	}
 	todoList := &model.TodoList{
-		Filename: "",
+		Filename: file,
 		Items:    previousTodoList,
 	}
 
 	payload := "new task"
-	cmd, _ := NewAddTodo(todoList, newDummyView(), payload)
+	view := newDummyView()
+	cmd, _ := NewAddTodo(todoList, view, payload)
 
 	cmd.Execute()
 
@@ -94,5 +98,13 @@ func TestAddTodo_Execute(t *testing.T) {
 
 	if addedTodo.IsDone {
 		t.Errorf("expected todo not to be done")
+	}
+
+	if view.RenderListCalls == 0 {
+		t.Errorf("expected view.RenderList to have been called")
+	}
+
+	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected file %v to exist", file)
 	}
 }

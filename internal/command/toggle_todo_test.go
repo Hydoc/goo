@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"github.com/Hydoc/goo/internal/model"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -60,6 +61,16 @@ func TestNewToggleTodo(t *testing.T) {
 			err:     errors.New("there is no todo with id 56"),
 			want:    nil,
 		},
+		{
+			name: "not create when invalid id is passed",
+			todoList: &model.TodoList{
+				Filename: "",
+				Items:    make([]*model.Todo, 0),
+			},
+			payload: "56a",
+			err:     errors.New("56a is an invalid id"),
+			want:    nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -78,8 +89,10 @@ func TestNewToggleTodo(t *testing.T) {
 }
 
 func TestToggleTodo_Execute(t *testing.T) {
+	file := "./test.json"
+	defer os.Remove(file)
 	todoList := &model.TodoList{
-		Filename: "",
+		Filename: file,
 		Items: []*model.Todo{
 			{
 				Id:     1,
@@ -89,10 +102,19 @@ func TestToggleTodo_Execute(t *testing.T) {
 		},
 	}
 
-	cmd, _ := NewToggleTodo(todoList, newDummyView(), "1")
+	view := newDummyView()
+	cmd, _ := NewToggleTodo(todoList, view, "1")
 	cmd.Execute()
+
+	if view.RenderListCalls == 0 {
+		t.Errorf("expected view.RenderList to have been called")
+	}
 
 	if !todoList.Items[0].IsDone {
 		t.Error("expected todo at index 0 to be done")
+	}
+
+	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected file %v to exist", file)
 	}
 }

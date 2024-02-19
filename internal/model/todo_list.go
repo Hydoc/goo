@@ -15,6 +15,14 @@ func (list *TodoList) Add(todo *Todo) {
 	list.Items = append(list.Items, todo)
 }
 
+func (list *TodoList) Swap(firstId, secondId int) {
+	firstTodo := list.Find(firstId)
+	secondTodo := list.Find(secondId)
+	tmp := firstTodo.Label
+	firstTodo.Label = secondTodo.Label
+	secondTodo.Label = tmp
+}
+
 func (list *TodoList) Find(id int) *Todo {
 	for _, todo := range list.Items {
 		if todo.Id == id {

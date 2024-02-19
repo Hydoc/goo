@@ -50,3 +50,4 @@ export PATH=$PATH:$HOME/go/bin && goo add I did it!
 | `toggle` | Toggle the done state of a todo by its id                                           | `goo toggle 1`           |
 | `list`   | List all todos in the file                                                          | `goo list`               |
 | `clear`  | Clear the whole list                                                                | `goo clear`              |
+| `swap`   | Swap the label of two todos by their id                                             | `goo swap 1 2`           |

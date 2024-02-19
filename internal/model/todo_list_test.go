@@ -106,6 +106,44 @@ func TestNewTodoListFromFile(t *testing.T) {
 	}
 }
 
+func TestTodoList_Swap(t *testing.T) {
+	list := &TodoList{
+		Filename: "",
+		Items: []*Todo{
+			{
+				Id:     1,
+				Label:  "Hello",
+				IsDone: true,
+			},
+			{
+				Id:     2,
+				Label:  "World",
+				IsDone: false,
+			},
+		},
+	}
+
+	list.Swap(1, 2)
+
+	firstTodo := list.Items[0]
+	if firstTodo.Label != "World" {
+		t.Errorf("want first todo label World, got %s", firstTodo.Label)
+	}
+
+	if firstTodo.IsDone != true {
+		t.Errorf("expected done state not to be swapped")
+	}
+
+	secondTodo := list.Items[1]
+	if secondTodo.Label != "Hello" {
+		t.Errorf("want second todo label Hello, got %s", secondTodo.Label)
+	}
+
+	if secondTodo.IsDone != false {
+		t.Errorf("expected done state not to be swapped")
+	}
+}
+
 func TestTodoList_Add(t *testing.T) {
 	list := &TodoList{
 		Filename: "",

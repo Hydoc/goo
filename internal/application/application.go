@@ -22,7 +22,8 @@ const (
   rm: Delete a todo by its id
   edit: Edit a todo by its id and a new label, use '{}' to insert the old value
   add: Add a new todo
-  clear: Clear the whole list`
+  clear: Clear the whole list
+  swap: Swap the labels of two todos by their id`
 )
 
 var filename string
@@ -47,6 +48,7 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 	toggle := flag.NewFlagSet("toggle", flag.ExitOnError)
 	edit := flag.NewFlagSet("edit", flag.ExitOnError)
 	doClear := flag.NewFlagSet("clear", flag.ExitOnError)
+	swap := flag.NewFlagSet("swap", flag.ExitOnError)
 
 	cmdMap := map[string]command.FabricateCommand{
 		list.Name():     command.NewListTodos,
@@ -55,6 +57,7 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		toggle.Name():   command.NewToggleTodo,
 		edit.Name():     command.NewEditTodo,
 		doClear.Name():  command.NewClear,
+		swap.Name():     command.NewSwap,
 	}
 
 	flag.Usage = func() {

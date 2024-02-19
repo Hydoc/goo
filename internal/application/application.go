@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"github.com/Hydoc/goo/internal/command"
-	"github.com/Hydoc/goo/internal/controller"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"os"
@@ -15,30 +14,15 @@ import (
 const (
 	defaultFileName = ".goo.json"
 	usage           = `How to use goo
-  -h, --help
-    	Prints this information
-
   -f, --file
     	Path to a file to use (has to be json, if the file does not exist it gets created)
 
-  -l, --list
-        List all todos
-
-  -t, --toggle
-        Toggle the state of a todo by its id
-
-  -d, --delete
-        Delete a todo by its id
-
-  -e, --edit
-        Edit a todo by its id and a new label, use '{}' to insert the old value
-             e.g goo --edit 1 {} World!
-
-  -a, --add
-        Add a new todo
-
-  --clear
-        Clear the whole list`
+  list: List all todos
+  toggle: Toggle the state of a todo by its id
+  delete: Delete a toto by its id
+  edit: Edit a todo by its id and a new label, use '{}' to insert the old value
+  add: Add a new todo
+  clear: Clear the whole list`
 )
 
 var filename string
@@ -53,26 +37,25 @@ func createFileIfNotExists() error {
 	return nil
 }
 
-func Main(view view.View, userHomeDir func() (string, error)) {
+func Main(view view.View, userHomeDir func() (string, error)) int {
 	file := flag.String("file", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 	flag.StringVar(file, "f", "", "Path to a file to use (has to be json, if the file does not exist it gets created)")
 
-	list := flag.Bool("list", false, "List all todos")
-	flag.BoolVar(list, "l", false, "List all todos")
+	list := flag.NewFlagSet("list", flag.ExitOnError)
+	add := flag.NewFlagSet("add", flag.ExitOnError)
+	doDelete := flag.NewFlagSet("rm", flag.ExitOnError)
+	toggle := flag.NewFlagSet("toggle", flag.ExitOnError)
+	edit := flag.NewFlagSet("edit", flag.ExitOnError)
+	doClear := flag.NewFlagSet("clear", flag.ExitOnError)
 
-	toggle := flag.Int("toggle", 0, "Toggle the state of a todo by its id")
-	flag.IntVar(toggle, "t", 0, "Toggle the state of a todo by its id")
-
-	add := flag.Bool("add", false, "Add a new todo")
-	flag.BoolVar(add, "a", false, "Add a new todo")
-
-	doDelete := flag.Int("delete", 0, "Delete a todo by its id")
-	flag.IntVar(doDelete, "d", 0, "Delete a todo by its id")
-
-	edit := flag.Bool("edit", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
-	flag.BoolVar(edit, "e", false, "Edit a todo by its id and a new label, use '{}' to insert the old value")
-
-	doClear := flag.Bool("clear", false, "")
+	cmdMap := map[string]command.FabricateCommand{
+		list.Name():     command.NewListTodos,
+		add.Name():      command.NewAddTodo,
+		doDelete.Name(): command.NewDeleteTodo,
+		toggle.Name():   command.NewToggleTodo,
+		edit.Name():     command.NewEditTodo,
+		doClear.Name():  command.NewClear,
+	}
 
 	flag.Usage = func() {
 		view.RenderLine(usage)
@@ -87,7 +70,7 @@ func Main(view view.View, userHomeDir func() (string, error)) {
 		homeDir, err := userHomeDir()
 		if err != nil {
 			view.RenderLine(err.Error())
-			return
+			return 1
 		}
 		filename = filepath.Join(homeDir, defaultFileName)
 	}
@@ -96,23 +79,32 @@ func Main(view view.View, userHomeDir func() (string, error)) {
 
 	if err != nil {
 		view.RenderLine(err.Error())
-		return
+		return 1
 	}
 
 	todoList, err := model.NewTodoListFromFile(filename)
 	if err != nil {
 		view.RenderLine(err.Error())
-		return
+		return 1
 	}
 
-	args := strings.TrimSpace(strings.Join(flag.Args(), " "))
-	commandFactory := command.NewFactory()
-	ctr := controller.New(view, todoList, commandFactory)
-	code, err := ctr.Handle(*list, *toggle, *add, *doDelete, *edit, *doClear, args)
+	if len(os.Args) < 2 || (len(*file) > 0 && len(os.Args) < 4) {
+		flag.Usage()
+		return 2
+	}
+
+	fabricateCommand, ok := cmdMap[flag.Args()[0]]
+	if !ok {
+		flag.Usage()
+		return 2
+	}
+
+	args := strings.TrimSpace(strings.Join(flag.Args()[1:], " "))
+	cmd, err := fabricateCommand(todoList, view, args)
 	if err != nil {
 		view.RenderLine(err.Error())
+		return 1
 	}
-	if code == 0 && !*list {
-		view.RenderList(todoList)
-	}
+	cmd.Execute()
+	return 0
 }

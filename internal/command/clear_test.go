@@ -18,8 +18,13 @@ func TestClear_Execute(t *testing.T) {
 			IsDone: true,
 		},
 	}}
-	cmd := newClear(todoList)
+	view := newDummyView()
+	cmd, _ := NewClear(todoList, view, "")
 	cmd.Execute()
+
+	if view.RenderListCalls == 0 {
+		t.Errorf("expected view.RenderList to have been called")
+	}
 
 	if todoList.HasItems() {
 		t.Error("expected todo list to be cleared")

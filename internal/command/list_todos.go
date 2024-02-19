@@ -5,16 +5,15 @@ import (
 	"github.com/Hydoc/goo/internal/view"
 )
 
-type Clear struct {
+type ListTodos struct {
 	todoList *model.TodoList
 	view     view.View
 }
 
-func (cmd *Clear) Execute() {
-	cmd.todoList.Clear()
+func (cmd *ListTodos) Execute() {
 	cmd.view.RenderList(cmd.todoList)
 }
 
-func NewClear(todoList *model.TodoList, view view.View, _ string) (Command, error) {
-	return &Clear{todoList, view}, nil
+func NewListTodos(todoList *model.TodoList, view view.View, _ string) (Command, error) {
+	return &ListTodos{todoList, view}, nil
 }

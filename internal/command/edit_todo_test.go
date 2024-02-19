@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"github.com/Hydoc/goo/internal/model"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -13,7 +14,7 @@ func TestNewEditTodo(t *testing.T) {
 		todoList *model.TodoList
 		payload  string
 		err      error
-		want     *EditTodo
+		want     Command
 	}{
 		{
 			name: "create normally",
@@ -30,6 +31,7 @@ func TestNewEditTodo(t *testing.T) {
 			payload: "1 Bla {} bla",
 			err:     nil,
 			want: &EditTodo{
+				view: newDummyView(),
 				todoList: &model.TodoList{
 					Filename: "",
 					Items: []*model.Todo{
@@ -96,7 +98,7 @@ func TestNewEditTodo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := newEditTodo(test.todoList, test.payload)
+			got, err := NewEditTodo(test.todoList, newDummyView(), test.payload)
 
 			if err != nil && !reflect.DeepEqual(test.err, err) {
 				t.Errorf("want error %v, got %v", test.err, err)
@@ -110,8 +112,10 @@ func TestNewEditTodo(t *testing.T) {
 }
 
 func TestEditTodo_Execute(t *testing.T) {
+	file := "./test.json"
+	defer os.Remove(file)
 	todoList := &model.TodoList{
-		Filename: "",
+		Filename: file,
 		Items: []*model.Todo{
 			{
 				Id:     1,
@@ -123,11 +127,20 @@ func TestEditTodo_Execute(t *testing.T) {
 	payload := "1 Bla {} bla"
 	wantLabel := "Bla Test bla"
 
-	cmd, _ := newEditTodo(todoList, payload)
+	view := newDummyView()
+	cmd, _ := NewEditTodo(todoList, view, payload)
 	cmd.Execute()
+
+	if view.RenderListCalls == 0 {
+		t.Errorf("expected view.RenderList to have been called")
+	}
 
 	editedItem := todoList.Items[0]
 	if editedItem.Label != wantLabel {
 		t.Errorf("want label %v, got %v", wantLabel, editedItem.Label)
+	}
+
+	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected file %v to exist", file)
 	}
 }

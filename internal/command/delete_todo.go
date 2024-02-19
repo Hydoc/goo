@@ -22,11 +22,11 @@ func (cmd *DeleteTodo) Execute() {
 func NewDeleteTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	id, err := strconv.Atoi(payload)
 	if err != nil {
-		return nil, fmt.Errorf("%s is an invalid id", payload)
+		return nil, fmt.Errorf(ErrInvalidId, payload)
 	}
 
 	if !todoList.Has(id) {
-		return nil, fmt.Errorf("there is no todo with id %d", id)
+		return nil, fmt.Errorf(ErrNoTodoWithId, id)
 	}
 
 	return &DeleteTodo{todoList, view, id}, nil

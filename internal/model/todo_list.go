@@ -7,8 +7,9 @@ import (
 )
 
 type TodoList struct {
-	Filename string
-	Items    []*Todo
+	Filename string  `json:"-"`
+	Items    []*Todo `json:"items"`
+	TagList  []Tag   `json:"tagList"`
 }
 
 func (list *TodoList) Add(todo *Todo) {
@@ -30,6 +31,23 @@ func (list *TodoList) Find(id int) *Todo {
 		}
 	}
 	return nil
+}
+
+func (list *TodoList) CreateTagIfNotExist(tagName string) Tag {
+	for _, tag := range list.TagList {
+		if tag.Name == tagName {
+			return tag
+		}
+	}
+
+	tag := NewTag(list.NextTagId(), tagName)
+	list.TagList = append(list.TagList, tag)
+	return tag
+}
+
+func (list *TodoList) Tag(id int, tagId TagId) {
+	todo := list.Find(id)
+	todo.AddTag(tagId)
 }
 
 func (list *TodoList) LenOfLongestTodo() int {
@@ -57,6 +75,15 @@ func (list *TodoList) Edit(id int, label string) {
 func (list *TodoList) Has(id int) bool {
 	for _, todo := range list.Items {
 		if todo.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (list *TodoList) HasTag(id TagId) bool {
+	for _, tag := range list.TagList {
+		if tag.Id == id {
 			return true
 		}
 	}
@@ -97,7 +124,7 @@ func (list *TodoList) SortedByIdAndState() *TodoList {
 	}
 }
 
-func (list *TodoList) NextId() int {
+func (list *TodoList) NextTodoId() int {
 	if len(list.Items) == 0 {
 		return 1
 	}
@@ -105,8 +132,16 @@ func (list *TodoList) NextId() int {
 	return list.Items[len(list.Items)-1].Id + 1
 }
 
+func (list *TodoList) NextTagId() TagId {
+	if len(list.TagList) == 0 {
+		return 1
+	}
+
+	return list.TagList[len(list.TagList)-1].Id + 1
+}
+
 func (list *TodoList) SaveToFile() {
-	encoded, _ := json.Marshal(list.Items)
+	encoded, _ := json.Marshal(list)
 	_ = os.WriteFile(list.Filename, encoded, 0644)
 }
 
@@ -115,19 +150,24 @@ func (list *TodoList) Clear() {
 }
 
 func NewTodoListFromFile(filename string) (*TodoList, error) {
-	var items []*Todo
+	var todoList *TodoList
 	jsonBytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonBytes, &items)
+	err = json.Unmarshal(jsonBytes, &todoList)
 	if err != nil {
 		return nil, err
 	}
 
+	if todoList.TagList == nil {
+		todoList.TagList = make([]Tag, 0)
+	}
+
 	return &TodoList{
 		Filename: filename,
-		Items:    items,
+		Items:    todoList.Items,
+		TagList:  todoList.TagList,
 	}, nil
 }

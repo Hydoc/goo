@@ -11,6 +11,7 @@ import (
 type View interface {
 	RenderList(todoList *model.TodoList)
 	RenderLine(str string)
+	RenderTags(todoList *model.TodoList)
 }
 
 type StdoutView struct {
@@ -19,6 +20,10 @@ type StdoutView struct {
 
 func (v *StdoutView) RenderLine(str string) {
 	fmt.Fprintln(v.writer, str)
+}
+
+func (v *StdoutView) RenderTags(todoList *model.TodoList) {
+	fmt.Fprintln(v.writer, todoList.TagList)
 }
 
 func (v *StdoutView) RenderList(todoList *model.TodoList) {

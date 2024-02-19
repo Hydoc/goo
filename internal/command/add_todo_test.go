@@ -11,6 +11,7 @@ import (
 type dummyView struct {
 	RenderListCalls int
 	RenderLineCalls int
+	RenderTagCalls  int
 }
 
 func (d *dummyView) RenderList(_ *model.TodoList) {
@@ -21,8 +22,12 @@ func (d *dummyView) RenderLine(_ string) {
 	d.RenderLineCalls++
 }
 
+func (d *dummyView) RenderTags(_ *model.TodoList) {
+	d.RenderTagCalls++
+}
+
 func newDummyView() *dummyView {
-	return &dummyView{0, 0}
+	return &dummyView{0, 0, 0}
 }
 
 func TestNewAddTodo(t *testing.T) {

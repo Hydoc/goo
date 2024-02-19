@@ -32,26 +32,40 @@ func TestNewTodoListFromFile(t *testing.T) {
 	filename := "test.json"
 	tests := []struct {
 		name       string
-		todoItems  interface{}
+		todoList   interface{}
 		err        error
 		want       *TodoList
 		createFile bool
 	}{
 		{
-			name:       "create from empty file",
-			todoItems:  []*Todo{},
+			name: "create from empty file",
+			todoList: &TodoList{
+				Filename: filename,
+				TagList:  nil,
+				Items:    []*Todo{},
+			},
 			err:        nil,
 			createFile: true,
 			want: &TodoList{
 				Filename: filename,
 				Items:    []*Todo{},
+				TagList:  make([]Tag, 0),
 			},
 		},
 		{
 			name: "create from file with todos",
-			todoItems: []*Todo{
-				NewTodo("Test", 1),
-				NewTodo("Another Test", 2),
+			todoList: &TodoList{
+				Filename: filename,
+				Items: []*Todo{
+					NewTodo("Test", 1),
+					NewTodo("Another Test", 2),
+				},
+				TagList: []Tag{
+					{
+						Id:   1,
+						Name: "hi",
+					},
+				},
 			},
 			err:        nil,
 			createFile: true,
@@ -61,27 +75,26 @@ func TestNewTodoListFromFile(t *testing.T) {
 					NewTodo("Test", 1),
 					NewTodo("Another Test", 2),
 				},
+				TagList: []Tag{
+					{
+						Id:   1,
+						Name: "hi",
+					},
+				},
 			},
 		},
 		{
 			name:       "not create due to not existing file",
-			todoItems:  make([]*Todo, 0),
 			err:        &os.PathError{Op: "open", Path: "test.json", Err: syscall.ENOENT},
 			want:       nil,
 			createFile: false,
 		},
 		{
 			name: "not create due to invalid json",
-			todoItems: map[string]interface{}{
-				"invalid": "no todo item",
+			todoList: map[string]interface{}{
+				"tagList": []int{1, 2, 3},
 			},
-			err: &json.UnmarshalTypeError{
-				Value:  "object",
-				Type:   reflect.TypeOf([]*Todo{}),
-				Offset: 1,
-				Struct: "",
-				Field:  "",
-			},
+			err:        &json.UnmarshalTypeError{Value: "number", Type: reflect.TypeOf(Tag{}), Offset: 13, Struct: "TodoList", Field: "tagList"},
 			want:       nil,
 			createFile: true,
 		},
@@ -90,12 +103,12 @@ func TestNewTodoListFromFile(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			if test.createFile {
-				tearDown := setUpFile(t, filename, test.todoItems)
+				tearDown := setUpFile(t, filename, test.todoList)
 				defer tearDown()
 			}
 			todoList, err := NewTodoListFromFile(filename)
 
-			if err != nil && !reflect.DeepEqual(err, test.err) {
+			if err != nil && test.err.Error() != err.Error() {
 				t.Errorf("expected error %#v, but got %#v", test.err, err)
 			}
 
@@ -402,6 +415,7 @@ func TestTodoList_Toggle(t *testing.T) {
 					Id:     2,
 					Label:  "Hello World!",
 					IsDone: true,
+					Tags:   make([]TagId, 0),
 				},
 				NewTodo("Hello World", 3),
 			},
@@ -490,7 +504,7 @@ func TestTodoList_NextId(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			nextId := test.todoList.NextId()
+			nextId := test.todoList.NextTodoId()
 			if !reflect.DeepEqual(nextId, test.want) {
 				t.Errorf("want todo list items %v, got %v", test.want, nextId)
 			}
@@ -500,11 +514,11 @@ func TestTodoList_NextId(t *testing.T) {
 
 func TestTodoList_SaveToFile(t *testing.T) {
 	filename := "test.json"
-	tearDown := setUpFile(t, filename, []*Todo{})
+	tearDown := setUpFile(t, filename, &TodoList{})
 	defer tearDown()
 
 	todoList, _ := NewTodoListFromFile(filename)
-	todoList.Add(NewTodo("A", todoList.NextId()))
+	todoList.Add(NewTodo("A", todoList.NextTodoId()))
 	todoList.SaveToFile()
 
 	todoList, _ = NewTodoListFromFile(filename)

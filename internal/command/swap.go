@@ -32,11 +32,11 @@ func NewSwap(todoList *model.TodoList, view view.View, payload string) (Command,
 	for _, entry := range splitBySpace {
 		id, err := strconv.Atoi(entry)
 		if err != nil {
-			return nil, fmt.Errorf("%s is an invalid id", entry)
+			return nil, fmt.Errorf(ErrInvalidId, entry)
 		}
 
 		if !todoList.Has(id) {
-			return nil, fmt.Errorf("there is no todo with id %d", id)
+			return nil, fmt.Errorf(ErrNoTodoWithId, id)
 		}
 		ids = append(ids, id)
 	}

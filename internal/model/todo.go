@@ -1,9 +1,18 @@
 package model
 
+import "slices"
+
 type Todo struct {
-	Id     int    `json:"id"`
-	Label  string `json:"label"`
-	IsDone bool   `json:"isDone"`
+	Id     int     `json:"id"`
+	Label  string  `json:"label"`
+	IsDone bool    `json:"isDone"`
+	Tags   []TagId `json:"tags"`
+}
+
+func (t *Todo) AddTag(tagId TagId) {
+	if !slices.Contains(t.Tags, tagId) {
+		t.Tags = append(t.Tags, tagId)
+	}
 }
 
 func (t *Todo) DoneAsString() string {
@@ -29,5 +38,6 @@ func NewTodo(label string, id int) *Todo {
 		id,
 		label,
 		false,
+		make([]TagId, 0),
 	}
 }

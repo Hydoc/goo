@@ -1,12 +1,16 @@
 package command
 
 import (
+	"errors"
 	"github.com/Hydoc/goo/internal/model"
+	"os"
 	"testing"
 )
 
 func TestClear_Execute(t *testing.T) {
-	todoList := &model.TodoList{Items: []*model.Todo{
+	file := "./test.json"
+	defer os.Remove(file)
+	todoList := &model.TodoList{Filename: file, Items: []*model.Todo{
 		{
 			Id:     1,
 			Label:  "should be removed",
@@ -28,5 +32,9 @@ func TestClear_Execute(t *testing.T) {
 
 	if todoList.HasItems() {
 		t.Error("expected todo list to be cleared")
+	}
+
+	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected file %v to exist", file)
 	}
 }

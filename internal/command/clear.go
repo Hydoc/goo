@@ -13,6 +13,7 @@ type Clear struct {
 func (cmd *Clear) Execute() {
 	cmd.todoList.Clear()
 	cmd.view.RenderList(cmd.todoList)
+	cmd.todoList.SaveToFile()
 }
 
 func NewClear(todoList *model.TodoList, view view.View, _ string) (Command, error) {

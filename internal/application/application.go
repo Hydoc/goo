@@ -19,7 +19,7 @@ const (
 
   list: List all todos
   toggle: Toggle the state of a todo by its id
-  delete: Delete a toto by its id
+  rm: Delete a todo by its id
   edit: Edit a todo by its id and a new label, use '{}' to insert the old value
   add: Add a new todo
   clear: Clear the whole list`

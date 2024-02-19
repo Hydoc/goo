@@ -72,7 +72,7 @@ func Test_Main(t *testing.T) {
 		os.Args = []string{"without arguments should print usage"}
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
+		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -275,7 +275,7 @@ func Test_Main(t *testing.T) {
 		Main(v, userHomeDirWith("./", nil))
 		flag.Usage()
 
-		want := "open /my-file.json: permission denied\nHow to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
+		want := "open /my-file.json: permission denied\nHow to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
 
 		if !strings.Contains(buffer.String(), want) {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -357,7 +357,7 @@ func Test_Main(t *testing.T) {
 		flag.CommandLine = flag.NewFlagSet("non existent subcommand should print usage", flag.ExitOnError)
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  delete: Delete a toto by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
+		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())

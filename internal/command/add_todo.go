@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
-	"io/fs"
 )
 
 type AddTodo struct {
@@ -20,7 +19,6 @@ func (cmd *AddTodo) Execute() {
 
 func NewAddTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	if len(payload) == 0 {
-		fs.ErrClosed
 		return nil, errEmptyNotAllowed()
 	}
 

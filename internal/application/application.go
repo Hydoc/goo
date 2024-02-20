@@ -164,7 +164,6 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 			fabricateCommand = command.NewRemoveTag
 		case *tagAdd:
 			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
-			fmt.Println(tag.Args())
 			fabricateCommand = command.NewAddTag
 		default:
 			fabricateCommand = command.NewTagTodo

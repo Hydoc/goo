@@ -42,12 +42,12 @@ export PATH=$PATH:$HOME/go/bin && goo add I did it!
 
 ### Commands
 
-| Command  | Description                                                                         | Example                  |
-|----------|-------------------------------------------------------------------------------------|--------------------------|
-| `add`    | Adds a new todo to the given list                                                   | `goo add Hello World!`   |
-| `rm`     | Removes a todo by its id                                                            | `goo rm 1`               |
-| `edit`   | Edits a todo by its id and a new label. Use curly braces (`{}`) to insert old value | `goo edit 1 {} World {}` |
-| `toggle` | Toggle the done state of a todo by its id                                           | `goo toggle 1`           |
-| `list`   | List all todos in the file                                                          | `goo list`               |
-| `clear`  | Clear the whole list                                                                | `goo clear`              |
-| `swap`   | Swap the label of two todos by their id                                             | `goo swap 1 2`           |
+| Command  | Description                                                                         | Example                |
+|----------|-------------------------------------------------------------------------------------|------------------------|
+| `add`    | Adds a new todo to the given list                                                   | `goo add Hello World!` |
+| `rm`     | Removes a todo by its id                                                            | `goo rm 1`             |
+| `edit`   | Edits a todo by its id and a new label. Use curly braces (`{}`) to insert old value | `goo edit 1 {} World`  |
+| `toggle` | Toggle the done state of a todo by its id                                           | `goo toggle 1`         |
+| `list`   | List all todos in the file                                                          | `goo list`             |
+| `clear`  | Clear the whole list                                                                | `goo clear`            |
+| `swap`   | Swap the label of two todos by their id                                             | `goo swap 1 2`         |

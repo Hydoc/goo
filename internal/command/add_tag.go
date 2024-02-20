@@ -16,5 +16,5 @@ func (cmd *AddTag) Execute() {
 }
 
 func NewAddTag(todoList *model.TodoList, view view.View, payload string) (Command, error) {
-	return &AddTodo{todoList, view, payload}, nil
+	return &AddTag{todoList, view, payload}, nil
 }

@@ -59,7 +59,7 @@ func TestNewEditTodo(t *testing.T) {
 				},
 			},
 			payload: "Bla {} bla",
-			err:     errors.New("can not edit todo, id is missing"),
+			err:     errInvalidId("Bla"),
 			want:    nil,
 		},
 		{

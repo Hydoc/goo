@@ -27,6 +27,10 @@ func (t *Todo) HasTag(id TagId) bool {
 	return false
 }
 
+func (t *Todo) HasTags() bool {
+	return len(t.Tags) > 0
+}
+
 func (t *Todo) RemoveTag(tagId TagId) {
 	indexOfTag := slices.Index(t.Tags, tagId)
 	t.Tags = append(t.Tags[:indexOfTag], t.Tags[indexOfTag+1:]...)

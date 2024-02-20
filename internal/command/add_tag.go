@@ -14,7 +14,7 @@ type AddTag struct {
 
 func (cmd *AddTag) Execute() {
 	cmd.todoList.AddTag(model.NewTag(cmd.todoList.NextTagId(), cmd.tagNameToCreate))
-	cmd.view.RenderTags(cmd.todoList)
+	cmd.view.RenderTags(cmd.todoList.TagList)
 	cmd.todoList.SaveToFile()
 }
 

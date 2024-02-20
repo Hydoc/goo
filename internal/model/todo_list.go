@@ -178,6 +178,20 @@ func (list *TodoList) Clear() {
 	list.Items = make([]*Todo, 0)
 }
 
+func (list *TodoList) TagsForTodo(todoId int) []*Tag {
+	todo := list.Find(todoId)
+
+	out := []*Tag{}
+	for _, tagId := range todo.Tags {
+		for _, tag := range list.TagList {
+			if tagId == tag.Id {
+				out = append(out, tag)
+			}
+		}
+	}
+	return out
+}
+
 func NewTodoListFromFile(filename string) (*TodoList, error) {
 	var todoList *TodoList
 	jsonBytes, err := os.ReadFile(filename)

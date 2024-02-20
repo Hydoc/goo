@@ -49,7 +49,7 @@ func TestNewTodoListFromFile(t *testing.T) {
 			want: &TodoList{
 				Filename: filename,
 				Items:    []*Todo{},
-				TagList:  make([]Tag, 0),
+				TagList:  make([]*Tag, 0),
 			},
 		},
 		{
@@ -60,7 +60,7 @@ func TestNewTodoListFromFile(t *testing.T) {
 					NewTodo("Test", 1),
 					NewTodo("Another Test", 2),
 				},
-				TagList: []Tag{
+				TagList: []*Tag{
 					{
 						Id:   1,
 						Name: "hi",
@@ -75,7 +75,7 @@ func TestNewTodoListFromFile(t *testing.T) {
 					NewTodo("Test", 1),
 					NewTodo("Another Test", 2),
 				},
-				TagList: []Tag{
+				TagList: []*Tag{
 					{
 						Id:   1,
 						Name: "hi",
@@ -474,7 +474,7 @@ func TestTodoList_Toggle(t *testing.T) {
 	}
 }
 
-func TestTodoList_NextId(t *testing.T) {
+func TestTodoList_NextTodoId(t *testing.T) {
 	tests := []struct {
 		name     string
 		todoList *TodoList
@@ -485,6 +485,7 @@ func TestTodoList_NextId(t *testing.T) {
 			todoList: &TodoList{
 				Filename: "",
 				Items:    make([]*Todo, 0),
+				TagList:  make([]*Tag, 0),
 			},
 			want: 1,
 		},
@@ -494,9 +495,9 @@ func TestTodoList_NextId(t *testing.T) {
 				Filename: "",
 				Items: []*Todo{
 					NewTodo("Hello", 1),
-					NewTodo("Hello World!", 2),
 					NewTodo("Hello World", 3),
 				},
+				TagList: make([]*Tag, 0),
 			},
 			want: 4,
 		},
@@ -506,7 +507,7 @@ func TestTodoList_NextId(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			nextId := test.todoList.NextTodoId()
 			if !reflect.DeepEqual(nextId, test.want) {
-				t.Errorf("want todo list items %v, got %v", test.want, nextId)
+				t.Errorf("want %v, got %v", test.want, nextId)
 			}
 		})
 	}
@@ -651,5 +652,307 @@ func TestTodoList_Clear(t *testing.T) {
 
 	if todoList.HasItems() {
 		t.Error("expected todolist to be empty")
+	}
+}
+
+func TestTodoList_AddTag(t *testing.T) {
+	todoList := &TodoList{
+		Filename: "",
+		Items:    nil,
+		TagList:  nil,
+	}
+	wantTagList := []*Tag{
+		{
+			Id:   1,
+			Name: "test tag",
+		},
+	}
+	todoList.AddTag(NewTag(1, "Test Tag"))
+
+	if !reflect.DeepEqual(todoList.TagList, wantTagList) {
+		t.Errorf("want %v, got %v", wantTagList, todoList.TagList)
+	}
+}
+
+func TestTodoList_FindTag(t *testing.T) {
+	todoList := &TodoList{
+		TagList: []*Tag{
+			{
+				Id:   1,
+				Name: "hi",
+			},
+		},
+	}
+	tests := []struct {
+		name        string
+		tagIdToFind int
+		want        *Tag
+	}{
+		{
+			name:        "find when todo list has tag",
+			tagIdToFind: 1,
+			want: &Tag{
+				Id:   1,
+				Name: "hi",
+			},
+		},
+		{
+			name:        "not find when id not found in todo list tags",
+			tagIdToFind: 21,
+			want:        nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := todoList.FindTag(test.tagIdToFind)
+
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestTodoList_TagTodo(t *testing.T) {
+	todoList := TodoList{
+		Filename: "",
+		Items: []*Todo{
+			{
+				Id:     1,
+				Label:  "Test",
+				IsDone: false,
+				Tags:   make([]TagId, 0),
+			},
+		},
+		TagList: nil,
+	}
+	todoList.TagTodo(1, 12)
+
+	if !todoList.Find(1).HasTag(12) {
+		t.Error("expected todo with id 1 to have tag with id 12")
+	}
+}
+
+func TestTodoList_RemoveTagFromTodo(t *testing.T) {
+	todoList := TodoList{
+		Filename: "",
+		Items: []*Todo{
+			{
+				Id:     1,
+				Label:  "Test",
+				IsDone: false,
+				Tags:   []TagId{12},
+			},
+		},
+		TagList: nil,
+	}
+	todoList.RemoveTagFromTodo(12, 1)
+
+	if todoList.Find(1).HasTag(12) {
+		t.Error("expected todo with id 1 to not have tag with id 12")
+	}
+}
+
+func TestTodoList_LenOfLongestTag(t *testing.T) {
+	tests := []struct {
+		name     string
+		todoList *TodoList
+		want     int
+	}{
+		{
+			name: "one entry",
+			todoList: &TodoList{
+				Filename: "",
+				TagList: []*Tag{
+					NewTag(1, "BLA"),
+				},
+			},
+			want: len("BLA"),
+		},
+		{
+			name: "no entry",
+			todoList: &TodoList{
+				Filename: "",
+				TagList:  make([]*Tag, 0),
+			},
+			want: 0,
+		},
+		{
+			name: "multiple entries",
+			todoList: &TodoList{
+				Filename: "",
+				TagList: []*Tag{
+					NewTag(1, "Hello"),
+					NewTag(2, "Hello World123"),
+					NewTag(3, "Hello World!  "),
+				},
+			},
+			want: len("Hello World123"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todoList.LenOfLongestTag()
+			if !reflect.DeepEqual(test.want, got) {
+				t.Errorf("want todo list %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestTodoList_HasTag(t *testing.T) {
+	todoList := &TodoList{
+		Filename: "",
+		Items:    make([]*Todo, 0),
+		TagList: []*Tag{
+			NewTag(1, "bla"),
+		},
+	}
+
+	tests := []struct {
+		name      string
+		want      bool
+		tagToFind TagId
+	}{
+		{
+			name:      "true if todo list has tag",
+			want:      true,
+			tagToFind: 1,
+		},
+		{
+			name:      "false if todo list does not have tag",
+			want:      false,
+			tagToFind: 2,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := todoList.HasTag(test.tagToFind)
+
+			if got != test.want {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestTodoList_HasTagWith(t *testing.T) {
+	todoList := &TodoList{
+		Filename: "",
+		Items:    make([]*Todo, 0),
+		TagList: []*Tag{
+			NewTag(1, "bla"),
+		},
+	}
+
+	tests := []struct {
+		name      string
+		want      bool
+		tagToFind string
+	}{
+		{
+			name:      "true if todo list has tag",
+			want:      true,
+			tagToFind: "bla",
+		},
+		{
+			name:      "false if todo list does not have tag",
+			want:      false,
+			tagToFind: "BLUB",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := todoList.HasTagWith(test.tagToFind)
+
+			if got != test.want {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestTodoList_NextTagId(t *testing.T) {
+	tests := []struct {
+		name     string
+		todoList *TodoList
+		want     TagId
+	}{
+		{
+			name: "for empty list",
+			todoList: &TodoList{
+				Filename: "",
+				Items:    make([]*Todo, 0),
+				TagList:  make([]*Tag, 0),
+			},
+			want: 1,
+		},
+		{
+			name: "with entries",
+			todoList: &TodoList{
+				Filename: "",
+				Items:    make([]*Todo, 0),
+				TagList: []*Tag{
+					NewTag(1, "bla"),
+					NewTag(3, "123"),
+				},
+			},
+			want: 4,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			nextId := test.todoList.NextTagId()
+			if nextId != test.want {
+				t.Errorf("want %v, got %v", test.want, nextId)
+			}
+		})
+	}
+}
+
+func TestTodoList_TagsForTodo(t *testing.T) {
+	tests := []struct {
+		name       string
+		want       []*Tag
+		idToSearch int
+		todoList   *TodoList
+	}{
+		{
+			name: "do find",
+			want: []*Tag{
+				NewTag(1, "bla"),
+			},
+			idToSearch: 12,
+			todoList: &TodoList{
+				Filename: "",
+				Items: []*Todo{
+					{
+						Id:     12,
+						Label:  "My Todo",
+						IsDone: false,
+						Tags:   []TagId{1},
+					},
+				},
+				TagList: []*Tag{
+					NewTag(1, "bla"),
+					NewTag(2, "123"),
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todoList.TagsForTodo(test.idToSearch)
+
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
 	}
 }

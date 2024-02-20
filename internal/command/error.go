@@ -12,7 +12,12 @@ const (
 	ErrEmptyTodoNotAllowed = "empty todo is not allowed"
 	ErrTagAlreadyExists    = "the tag %s already exists"
 	ErrTodoDoesNotHaveTag  = "the todo %d does not have tag with id %d"
+	ErrTodoHasNoTags       = "the todo has no tags"
 )
+
+func errTodoHasNoTags() error {
+	return errors.New(ErrTodoHasNoTags)
+}
 
 func errEmptyTodoNotAllowed() error { return errors.New(ErrEmptyTodoNotAllowed) }
 

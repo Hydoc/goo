@@ -59,7 +59,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("without arguments should print usage", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{})
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -72,7 +72,7 @@ func Test_Main(t *testing.T) {
 		os.Args = []string{"without arguments should print usage"}
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n  swap: Swap the labels of two todos by their id\n"
+		want := "How to use goo\n  -f, --file\n    Path to a file to use (has to be json, if the file does not exist it gets created, has to be the first argument before the subcommands)\n    goo -f path/to/file.json list\n\n  list: List all todos\n    goo list\n\n  toggle: Toggle the state of a todo by its id\n    goo toggle <ID of todo:int>\n\n  rm: Delete a todo by its id\n    goo rm <ID of todo:int>\n\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n    goo edit <ID of todo:int> <new label:string>\n\n  add: Add a new todo\n    goo add <label:string>\n\n  clear: Clear the whole list (no confirmation required)\n    goo clear\n\n  swap: Swap the labels of two todos by their id\n    goo swap <ID of the first todo:int> <ID of the second todo:int>\n\n  tags: List all tags\n    goo tags\n       -tid <ID of todo:int> show all tags on this todo\n       -id <ID of tag:int> show all todos with this tag\n\n  tag: tag handling\n    goo tag <ID of todo:int> <ID of the tag:int>\n       adds the given tag to the todo\n\n    goo tag -c <Label of the tag:string>\n       creates a new tag\n\n    goo tag -rm\n       remove a tag or a tag from a todo\n       -rm <ID of tag:int> removes the tag from all todos and the tag itself\n       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -80,7 +80,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with add subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{})
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -101,8 +101,12 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with delete subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
-			model.NewTodo("should be deleted", 1),
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("should be deleted", 1),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		oldArgs := os.Args
 		defer func() {
@@ -124,8 +128,12 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with toggle subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
-			model.NewTodo("should be toggled", 1),
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("should be toggled", 1),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		oldArgs := os.Args
 		defer func() {
@@ -147,8 +155,12 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with edit subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
-			model.NewTodo("should be changed", 1),
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("should be changed", 1),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		oldArgs := os.Args
 		defer func() {
@@ -170,9 +182,13 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with clear subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
-			model.NewTodo("should be deleted", 1),
-			model.NewTodo("should also be deleted", 2),
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("should be deleted", 1),
+				model.NewTodo("should also be deleted", 2),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		oldArgs := os.Args
 		defer func() {
@@ -194,8 +210,12 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("with list subcommand", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, []*model.Todo{
-			model.NewTodo("Hi", 1),
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("Hi", 1),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		oldArgs := os.Args
 		defer func() {
@@ -218,8 +238,12 @@ func Test_Main(t *testing.T) {
 
 	t.Run("with file flag", func(t *testing.T) {
 		fileToUse := "another.json"
-		tearDownFile := setUpFile(t, fileToUse, []*model.Todo{
-			model.NewTodo("I should be printed", 1),
+		tearDownFile := setUpFile(t, fileToUse, &model.TodoList{
+			Filename: "",
+			Items: []*model.Todo{
+				model.NewTodo("I should be printed", 1),
+			},
+			TagList: make([]*model.Tag, 0),
 		})
 		defer tearDownFile()
 		oldArgs := os.Args
@@ -261,7 +285,8 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("correct flag.Usage", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
+		filename = defaultFileName
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{})
 		oldArgs := os.Args
 		defer func() {
 			os.Args = oldArgs
@@ -275,7 +300,7 @@ func Test_Main(t *testing.T) {
 		Main(v, userHomeDirWith("./", nil))
 		flag.Usage()
 
-		want := "open /my-file.json: permission denied\nHow to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n"
+		want := "How to use goo\n  -f, --file\n    Path to a file to use (has to be json, if the file does not exist it gets created, has to be the first argument before the subcommands)\n    goo -f path/to/file.json list\n\n  list: List all todos\n    goo list\n\n  toggle: Toggle the state of a todo by its id\n    goo toggle <ID of todo:int>\n\n  rm: Delete a todo by its id\n    goo rm <ID of todo:int>\n\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n    goo edit <ID of todo:int> <new label:string>\n\n  add: Add a new todo\n    goo add <label:string>\n\n  clear: Clear the whole list (no confirmation required)\n    goo clear\n\n  swap: Swap the labels of two todos by their id\n    goo swap <ID of the first todo:int> <ID of the second todo:int>\n\n  tags: List all tags\n    goo tags\n       -tid <ID of todo:int> show all tags on this todo\n       -id <ID of tag:int> show all todos with this tag\n\n  tag: tag handling\n    goo tag <ID of todo:int> <ID of the tag:int>\n       adds the given tag to the todo\n\n    goo tag -c <Label of the tag:string>\n       creates a new tag\n\n    goo tag -rm\n       remove a tag or a tag from a todo\n       -rm <ID of tag:int> removes the tag from all todos and the tag itself\n       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo\nHow to use goo\n  -f, --file\n    Path to a file to use (has to be json, if the file does not exist it gets created, has to be the first argument before the subcommands)\n    goo -f path/to/file.json list\n\n  list: List all todos\n    goo list\n\n  toggle: Toggle the state of a todo by its id\n    goo toggle <ID of todo:int>\n\n  rm: Delete a todo by its id\n    goo rm <ID of todo:int>\n\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n    goo edit <ID of todo:int> <new label:string>\n\n  add: Add a new todo\n    goo add <label:string>\n\n  clear: Clear the whole list (no confirmation required)\n    goo clear\n\n  swap: Swap the labels of two todos by their id\n    goo swap <ID of the first todo:int> <ID of the second todo:int>\n\n  tags: List all tags\n    goo tags\n       -tid <ID of todo:int> show all tags on this todo\n       -id <ID of tag:int> show all todos with this tag\n\n  tag: tag handling\n    goo tag <ID of todo:int> <ID of the tag:int>\n       adds the given tag to the todo\n\n    goo tag -c <Label of the tag:string>\n       creates a new tag\n\n    goo tag -rm\n       remove a tag or a tag from a todo\n       -rm <ID of tag:int> removes the tag from all todos and the tag itself\n       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo\n"
 
 		if !strings.Contains(buffer.String(), want) {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -283,7 +308,9 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("todolist creating fails", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, map[string]int{})
+		tearDown := setUpFile(t, defaultFileName, map[string]interface{}{
+			"tagList": []int{1, 2, 3},
+		})
 		defer tearDown()
 		oldArgs := os.Args
 		defer func() {
@@ -296,28 +323,7 @@ func Test_Main(t *testing.T) {
 		flag.CommandLine = flag.NewFlagSet("todolist creating fails", flag.ExitOnError)
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "json: cannot unmarshal object into Go value of type []*model.Todo\n"
-
-		if buffer.String() != want {
-			t.Errorf("want %#v, got %#v", want, buffer.String())
-		}
-	})
-
-	t.Run("print error when controller returns error", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
-		defer tearDown()
-		oldArgs := os.Args
-		defer func() {
-			os.Args = oldArgs
-		}()
-		buffer := bytes.NewBuffer(make([]byte, 0))
-		v := view.New(buffer)
-
-		os.Args = []string{"print error when controller returns error", "add"}
-		flag.CommandLine = flag.NewFlagSet("print error when controller returns error", flag.ExitOnError)
-		Main(v, userHomeDirWith("./", nil))
-
-		want := "empty todo is not allowed\n"
+		want := "json: cannot unmarshal number into Go struct field TodoList.tagList of type model.Tag\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())
@@ -344,7 +350,7 @@ func Test_Main(t *testing.T) {
 	})
 
 	t.Run("non existent subcommand should print usage", func(t *testing.T) {
-		tearDown := setUpFile(t, defaultFileName, make([]*model.Todo, 0))
+		tearDown := setUpFile(t, defaultFileName, &model.TodoList{})
 		defer tearDown()
 		oldArgs := os.Args
 		defer func() {
@@ -357,7 +363,7 @@ func Test_Main(t *testing.T) {
 		flag.CommandLine = flag.NewFlagSet("non existent subcommand should print usage", flag.ExitOnError)
 		Main(v, userHomeDirWith("./", nil))
 
-		want := "How to use goo\n  -f, --file\n    \tPath to a file to use (has to be json, if the file does not exist it gets created)\n\n  list: List all todos\n  toggle: Toggle the state of a todo by its id\n  rm: Delete a todo by its id\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n  add: Add a new todo\n  clear: Clear the whole list\n  swap: Swap the labels of two todos by their id\n"
+		want := "How to use goo\n  -f, --file\n    Path to a file to use (has to be json, if the file does not exist it gets created, has to be the first argument before the subcommands)\n    goo -f path/to/file.json list\n\n  list: List all todos\n    goo list\n\n  toggle: Toggle the state of a todo by its id\n    goo toggle <ID of todo:int>\n\n  rm: Delete a todo by its id\n    goo rm <ID of todo:int>\n\n  edit: Edit a todo by its id and a new label, use '{}' to insert the old value\n    goo edit <ID of todo:int> <new label:string>\n\n  add: Add a new todo\n    goo add <label:string>\n\n  clear: Clear the whole list (no confirmation required)\n    goo clear\n\n  swap: Swap the labels of two todos by their id\n    goo swap <ID of the first todo:int> <ID of the second todo:int>\n\n  tags: List all tags\n    goo tags\n       -tid <ID of todo:int> show all tags on this todo\n       -id <ID of tag:int> show all todos with this tag\n\n  tag: tag handling\n    goo tag <ID of todo:int> <ID of the tag:int>\n       adds the given tag to the todo\n\n    goo tag -c <Label of the tag:string>\n       creates a new tag\n\n    goo tag -rm\n       remove a tag or a tag from a todo\n       -rm <ID of tag:int> removes the tag from all todos and the tag itself\n       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo\n"
 
 		if buffer.String() != want {
 			t.Errorf("want %#v, got %#v", want, buffer.String())

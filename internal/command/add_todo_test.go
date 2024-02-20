@@ -22,7 +22,7 @@ func (d *dummyView) RenderLine(_ string) {
 	d.RenderLineCalls++
 }
 
-func (d *dummyView) RenderTags(_ *model.TodoList) {
+func (d *dummyView) RenderTags(_ []*model.Tag) {
 	d.RenderTagCalls++
 }
 

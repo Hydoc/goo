@@ -11,7 +11,7 @@ type ListTags struct {
 }
 
 func (cmd *ListTags) Execute() {
-	cmd.view.RenderTags(cmd.todoList)
+	cmd.view.RenderTags(cmd.todoList.TagList)
 }
 
 func NewListTags(todoList *model.TodoList, view view.View, _ string) (Command, error) {

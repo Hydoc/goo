@@ -32,7 +32,7 @@ func NewSwap(todoList *model.TodoList, view view.View, payload string) (Command,
 	for _, entry := range splitBySpace {
 		id, err := strconv.Atoi(entry)
 		if err != nil {
-			return nil, fmt.Errorf(ErrInvalidId, entry)
+			return nil, errInvalidId(entry)
 		}
 
 		if !todoList.Has(id) {

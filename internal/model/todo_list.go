@@ -16,6 +16,10 @@ func (list *TodoList) Add(todo *Todo) {
 	list.Items = append(list.Items, todo)
 }
 
+func (list *TodoList) AddTag(tag *Tag) {
+	list.TagList = append(list.TagList, tag)
+}
+
 func (list *TodoList) Swap(firstId, secondId int) {
 	firstTodo := list.Find(firstId)
 	secondTodo := list.Find(secondId)
@@ -31,18 +35,6 @@ func (list *TodoList) Find(id int) *Todo {
 		}
 	}
 	return nil
-}
-
-func (list *TodoList) CreateTagIfNotExist(tagName string) *Tag {
-	for _, tag := range list.TagList {
-		if tag.Name == tagName {
-			return tag
-		}
-	}
-
-	tag := NewTag(list.NextTagId(), tagName)
-	list.TagList = append(list.TagList, tag)
-	return tag
 }
 
 func (list *TodoList) FindTag(id int) *Tag {
@@ -64,10 +56,24 @@ func (list *TodoList) LenOfLongestTodo() int {
 		return 0
 	}
 
-	current := len(list.Items[0].Label)
+	current := len(list.Items[0].LabelAsString())
 	for _, todo := range list.Items {
-		if len(todo.Label) > current {
-			current = len(todo.Label)
+		if len(todo.LabelAsString()) > current {
+			current = len(todo.LabelAsString())
+		}
+	}
+	return current
+}
+
+func (list *TodoList) LenOfLongestTag() int {
+	if len(list.TagList) == 0 {
+		return 0
+	}
+
+	current := len(list.TagList[0].Name)
+	for _, tag := range list.TagList {
+		if len(tag.Name) > current {
+			current = len(tag.Name)
 		}
 	}
 	return current
@@ -93,6 +99,15 @@ func (list *TodoList) Has(id int) bool {
 func (list *TodoList) HasTag(id TagId) bool {
 	for _, tag := range list.TagList {
 		if tag.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (list *TodoList) HasTagWith(name string) bool {
+	for _, tag := range list.TagList {
+		if tag.Name == name {
 			return true
 		}
 	}

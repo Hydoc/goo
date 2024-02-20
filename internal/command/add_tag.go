@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
+	"strings"
 )
 
 type AddTag struct {
@@ -12,9 +13,17 @@ type AddTag struct {
 }
 
 func (cmd *AddTag) Execute() {
-	cmd.view.RenderLine("ADD_TAG")
+	cmd.todoList.AddTag(model.NewTag(cmd.todoList.NextTagId(), cmd.tagNameToCreate))
+	cmd.view.RenderTags(cmd.todoList)
+	cmd.todoList.SaveToFile()
 }
 
 func NewAddTag(todoList *model.TodoList, view view.View, payload string) (Command, error) {
-	return &AddTag{todoList, view, payload}, nil
+	normalizedTagName := strings.TrimSpace(strings.ToLower(payload))
+
+	if todoList.HasTagWith(normalizedTagName) {
+		return nil, errTagAlreadyExists(normalizedTagName)
+	}
+
+	return &AddTag{todoList, view, normalizedTagName}, nil
 }

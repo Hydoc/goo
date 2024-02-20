@@ -87,7 +87,7 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 	showTodosForTag := tags.Int("id", 0, "<ID of tag> show all todos with this tag")
 	tag := flag.NewFlagSet("tag", flag.ExitOnError)
 	tagRm := tag.Bool("rm", false, "delete a tag")
-	tagAdd := tag.String("c", "", "add a tag")
+	tagAdd := tag.Bool("c", false, "add a tag")
 
 	flag.Usage = func() {
 		view.RenderLine(usage)
@@ -162,7 +162,9 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 			fabricateCommand = command.NewRemoveTagFromTodo
 		case *tagRm && len(tag.Args()) == 1:
 			fabricateCommand = command.NewRemoveTag
-		case len(*tagAdd) > 0:
+		case *tagAdd:
+			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
+			fmt.Println(tag.Args())
 			fabricateCommand = command.NewAddTag
 		default:
 			fabricateCommand = command.NewTagTodo

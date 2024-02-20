@@ -20,7 +20,7 @@ func (cmd *ListTodosForTag) Execute() {
 func NewListTodosForTag(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	idOfTag, err := strconv.Atoi(payload)
 	if err != nil {
-		return nil, fmt.Errorf(ErrInvalidId, payload)
+		return nil, errInvalidId(payload)
 	}
 
 	if !todoList.HasTag(model.TagId(idOfTag)) {

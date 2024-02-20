@@ -22,7 +22,7 @@ func (cmd *ToggleTodo) Execute() {
 func NewToggleTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	id, err := strconv.Atoi(payload)
 	if err != nil {
-		return nil, fmt.Errorf(ErrInvalidId, payload)
+		return nil, errInvalidId(payload)
 	}
 
 	if !todoList.Has(id) {

@@ -28,14 +28,14 @@ func NewTagTodo(todoList *model.TodoList, view view.View, payload string) (Comma
 		return nil, fmt.Errorf("can not tag todo, need id of todo as first argument, the second has to be the id of the tag")
 	}
 
-	todoIdToTag, err := strconv.Atoi(splitBySpace[0])
+	tagId, err := strconv.Atoi(splitBySpace[0])
 	if err != nil {
-		return nil, fmt.Errorf(ErrInvalidId, splitBySpace[0])
+		return nil, errInvalidId(splitBySpace[0])
 	}
 
-	tagId, err := strconv.Atoi(splitBySpace[1])
+	todoIdToTag, err := strconv.Atoi(splitBySpace[1])
 	if err != nil {
-		return nil, fmt.Errorf(ErrInvalidId, splitBySpace[1])
+		return nil, errInvalidId(splitBySpace[1])
 	}
 
 	if !todoList.Has(todoIdToTag) {

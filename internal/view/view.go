@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+const (
+	idMarginRight = 4
+)
+
 type View interface {
 	RenderList(todoList *model.TodoList)
 	RenderLine(str string)
@@ -23,12 +27,24 @@ func (v *StdoutView) RenderLine(str string) {
 }
 
 func (v *StdoutView) RenderTags(todoList *model.TodoList) {
-	fmt.Fprintln(v.writer, todoList.TagList)
+	longestEntry := todoList.LenOfLongestTag()
+
+	idStr := v.addMargin(0, idMarginRight, "ID")
+	labelStr := v.addMargin(idMarginRight, longestEntry, "TAG")
+	headline := fmt.Sprintf("%s%s", idStr, labelStr)
+	v.RenderLine(headline)
+	v.RenderLine(strings.Repeat("-", len(headline)))
+	for _, tag := range todoList.TagList {
+		tagIdStr := v.addMargin(0, idMarginRight, strconv.Itoa(int(tag.Id)))
+		tagNameStr := v.addMargin(0, longestEntry, tag.Name)
+		todoStr := fmt.Sprintf("%s%s", tagIdStr, tagNameStr)
+
+		v.RenderLine(todoStr)
+	}
 }
 
 func (v *StdoutView) RenderList(todoList *model.TodoList) {
 	todoList = todoList.SortedByIdAndState()
-	idMarginRight := 4
 	offsetStatus := 8
 	offsetCheck := 7
 	longestEntry := todoList.LenOfLongestTodo()
@@ -42,7 +58,7 @@ func (v *StdoutView) RenderList(todoList *model.TodoList) {
 	v.RenderLine(strings.Repeat("-", len(headline)))
 	for _, todo := range todoList.Items {
 		todoIdStr := v.addMargin(0, idMarginRight, strconv.Itoa(todo.Id))
-		todoLabelStr := v.addMargin(0, longestEntry, todo.Label)
+		todoLabelStr := v.addMargin(0, longestEntry-1, todo.LabelAsString())
 		todoStateStr := v.addMargin(len(headline)-longestEntry-offsetCheck, 0, todo.DoneAsString())
 		todoStr := fmt.Sprintf("%s%s%s", todoIdStr, todoLabelStr, todoStateStr)
 

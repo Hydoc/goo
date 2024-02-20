@@ -1,6 +1,9 @@
 package model
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
 
 type Todo struct {
 	Id     int     `json:"id"`
@@ -13,6 +16,13 @@ func (t *Todo) AddTag(tagId TagId) {
 	if !slices.Contains(t.Tags, tagId) {
 		t.Tags = append(t.Tags, tagId)
 	}
+}
+
+func (t *Todo) LabelAsString() string {
+	if len(t.Tags) > 0 {
+		return fmt.Sprintf("%s 🏷", t.Label)
+	}
+	return t.Label
 }
 
 func (t *Todo) DoneAsString() string {

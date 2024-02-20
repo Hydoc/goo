@@ -28,7 +28,7 @@ func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Comm
 	id, err := strconv.Atoi(splitBySpace[0])
 
 	if err != nil {
-		return nil, fmt.Errorf(ErrInvalidId, splitBySpace[0])
+		return nil, errInvalidId(splitBySpace[0])
 	}
 
 	if !todoList.Has(id) {
@@ -38,7 +38,7 @@ func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Comm
 	newLabel := strings.Join(splitBySpace[1:], " ")
 
 	if len(newLabel) == 0 {
-		return nil, errEmptyNotAllowed()
+		return nil, errEmptyTodoNotAllowed()
 	}
 
 	return &EditTodo{todoList, view, id, newLabel}, nil

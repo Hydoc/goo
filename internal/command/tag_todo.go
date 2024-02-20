@@ -25,7 +25,7 @@ func NewTagTodo(todoList *model.TodoList, view view.View, payload string) (Comma
 	splitBySpace := strings.Split(payload, " ")
 
 	if len(splitBySpace) < 2 || len(splitBySpace) > 2 {
-		return nil, fmt.Errorf("can not tag todo, need id of todo as first argument, the second has to be the id of the tag")
+		return nil, fmt.Errorf("can not tag todo, need id of tag as first argument, the second has to be the id of the todo")
 	}
 
 	tagId, err := strconv.Atoi(splitBySpace[0])

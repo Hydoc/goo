@@ -159,8 +159,10 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		tag.Parse(flag.Args()[1:])
 		switch {
 		case *tagRm && len(tag.Args()) > 1:
+			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
 			fabricateCommand = command.NewRemoveTagFromTodo
 		case *tagRm && len(tag.Args()) == 1:
+			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
 			fabricateCommand = command.NewRemoveTag
 		case *tagAdd:
 			args = strings.TrimSpace(strings.Join(tag.Args(), " "))

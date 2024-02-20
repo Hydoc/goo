@@ -51,6 +51,11 @@ func (list *TodoList) TagTodo(id int, tagId TagId) {
 	todo.AddTag(tagId)
 }
 
+func (list *TodoList) RemoveTagFromTodo(tagId TagId, todoId int) {
+	todo := list.Find(todoId)
+	todo.RemoveTag(tagId)
+}
+
 func (list *TodoList) LenOfLongestTodo() int {
 	if !list.HasItems() {
 		return 0

@@ -18,6 +18,20 @@ func (t *Todo) AddTag(tagId TagId) {
 	}
 }
 
+func (t *Todo) HasTag(id TagId) bool {
+	for _, tagId := range t.Tags {
+		if tagId == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Todo) RemoveTag(tagId TagId) {
+	indexOfTag := slices.Index(t.Tags, tagId)
+	t.Tags = append(t.Tags[:indexOfTag], t.Tags[indexOfTag+1:]...)
+}
+
 func (t *Todo) LabelAsString() string {
 	if len(t.Tags) > 0 {
 		return fmt.Sprintf("%s 🏷", t.Label)

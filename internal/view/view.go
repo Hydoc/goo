@@ -58,7 +58,7 @@ func (v *StdoutView) RenderList(todoList *model.TodoList) {
 	v.RenderLine(strings.Repeat("-", len(headline)))
 	for _, todo := range todoList.Items {
 		todoIdStr := v.addMargin(0, idMarginRight, strconv.Itoa(todo.Id))
-		todoLabelStr := v.addMargin(0, longestEntry-1, todo.LabelAsString())
+		todoLabelStr := v.addMargin(0, longestEntry, todo.LabelAsString())
 		todoStateStr := v.addMargin(len(headline)-longestEntry-offsetCheck, 0, todo.DoneAsString())
 		todoStr := fmt.Sprintf("%s%s%s", todoIdStr, todoLabelStr, todoStateStr)
 

@@ -9,7 +9,7 @@ import (
 type TodoList struct {
 	Filename string  `json:"-"`
 	Items    []*Todo `json:"items"`
-	TagList  []Tag   `json:"tagList"`
+	TagList  []*Tag  `json:"tagList"`
 }
 
 func (list *TodoList) Add(todo *Todo) {
@@ -33,7 +33,7 @@ func (list *TodoList) Find(id int) *Todo {
 	return nil
 }
 
-func (list *TodoList) CreateTagIfNotExist(tagName string) Tag {
+func (list *TodoList) CreateTagIfNotExist(tagName string) *Tag {
 	for _, tag := range list.TagList {
 		if tag.Name == tagName {
 			return tag
@@ -45,7 +45,16 @@ func (list *TodoList) CreateTagIfNotExist(tagName string) Tag {
 	return tag
 }
 
-func (list *TodoList) Tag(id int, tagId TagId) {
+func (list *TodoList) FindTag(id int) *Tag {
+	for _, tag := range list.TagList {
+		if tag.Id == TagId(id) {
+			return tag
+		}
+	}
+	return nil
+}
+
+func (list *TodoList) TagTodo(id int, tagId TagId) {
 	todo := list.Find(id)
 	todo.AddTag(tagId)
 }
@@ -162,7 +171,7 @@ func NewTodoListFromFile(filename string) (*TodoList, error) {
 	}
 
 	if todoList.TagList == nil {
-		todoList.TagList = make([]Tag, 0)
+		todoList.TagList = make([]*Tag, 0)
 	}
 
 	return &TodoList{

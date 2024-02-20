@@ -9,6 +9,6 @@ type Tag struct {
 	Name string `json:"name"`
 }
 
-func NewTag(id TagId, name string) Tag {
-	return Tag{id, strings.ToLower(strings.TrimSpace(name))}
+func NewTag(id TagId, name string) *Tag {
+	return &Tag{id, strings.ToLower(strings.TrimSpace(name))}
 }

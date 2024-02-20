@@ -24,36 +24,39 @@ const (
     goo list
 
   toggle: Toggle the state of a todo by its id
-    goo toggle <ID of todo>
+    goo toggle <ID of todo:int>
 
   rm: Delete a todo by its id
-    goo rm <ID of todo>
+    goo rm <ID of todo:int>
 
   edit: Edit a todo by its id and a new label, use '{}' to insert the old value
-    goo edit <ID of todo> <new label>
+    goo edit <ID of todo:int> <new label:string>
 
   add: Add a new todo
-    goo add <label>
+    goo add <label:string>
 
   clear: Clear the whole list (no confirmation required)
     goo clear
 
   swap: Swap the labels of two todos by their id
-    goo swap <ID of the first todo> <ID of the second todo>
+    goo swap <ID of the first todo:int> <ID of the second todo:int>
 
   tags: List all tags
     goo tags
-       -tid <ID of todo> show all tags on this todo
-       -id <ID of tag> show all todos with this tag
+       -tid <ID of todo:int> show all tags on this todo
+       -id <ID of tag:int> show all todos with this tag
 
   tag: tag handling
-    goo tag <ID of todo> <label of the tag>
-       creates the tag if it does not exist and adds it to the todo
+    goo tag <ID of todo:int> <ID of the tag:int>
+       adds the given tag to the todo
+
+    goo tag -c <Label of the tag:string>
+       creates a new tag
 
     goo tag -rm
        remove a tag or a tag from a todo
-       -rm <ID of tag> removes the tag from all todos and the tag itself
-       -rm <ID of tag> <ID of todo> removes the specific tag from the todo`
+       -rm <ID of tag:int> removes the tag from all todos and the tag itself
+       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo`
 )
 
 var filename string
@@ -83,7 +86,8 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 	showTagsOnTodo := tags.Int("tid", 0, "<ID of todo> show all tags on this todo")
 	showTodosForTag := tags.Int("id", 0, "<ID of tag> show all todos with this tag")
 	tag := flag.NewFlagSet("tag", flag.ExitOnError)
-	tagRm := tag.Bool("rm", false, "remove a tag")
+	tagRm := tag.Bool("rm", false, "delete a tag")
+	tagAdd := tag.String("c", "", "add a tag")
 
 	flag.Usage = func() {
 		view.RenderLine(usage)
@@ -158,6 +162,8 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 			fabricateCommand = command.NewRemoveTagFromTodo
 		case *tagRm && len(tag.Args()) == 1:
 			fabricateCommand = command.NewRemoveTag
+		case len(*tagAdd) > 0:
+			fabricateCommand = command.NewAddTag
 		default:
 			fabricateCommand = command.NewTagTodo
 		}

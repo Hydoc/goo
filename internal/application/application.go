@@ -122,7 +122,9 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		return 2
 	}
 
-	fabricateCommand, args, err := command.Fabricate(
+	cmd, err := command.Fabricate(
+		todoList,
+		view,
 		flag.Args(),
 		list,
 		add,
@@ -138,16 +140,11 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		tagRm,
 		tagAdd,
 	)
-	if errors.Is(command.ErrCommandNotFound, err) {
-		flag.Usage()
-		return 1
-	}
-
-	cmd, err := fabricateCommand(todoList, view, args)
 	if err != nil {
 		view.RenderLine(err.Error())
 		return 1
 	}
+
 	cmd.Execute()
 	return 0
 }

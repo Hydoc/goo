@@ -3,14 +3,11 @@ package application
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"github.com/Hydoc/goo/internal/command"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -125,54 +122,25 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		return 2
 	}
 
-	var fabricateCommand command.FabricateCommand
-	args := strings.TrimSpace(strings.Join(flag.Args()[1:], " "))
-	fmt.Println(flag.Args())
-	switch flag.Args()[0] {
-	case list.Name():
-		fabricateCommand = command.NewListTodos
-	case add.Name():
-		fabricateCommand = command.NewAddTodo
-	case doDelete.Name():
-		fabricateCommand = command.NewDeleteTodo
-	case toggle.Name():
-		fabricateCommand = command.NewToggleTodo
-	case edit.Name():
-		fabricateCommand = command.NewEditTodo
-	case doClear.Name():
-		fabricateCommand = command.NewClear
-	case swap.Name():
-		fabricateCommand = command.NewSwap
-	case tags.Name():
-		tags.Parse(flag.Args()[1:])
-		switch {
-		case *showTagsOnTodo > 0:
-			args = strconv.Itoa(*showTagsOnTodo)
-			fabricateCommand = command.NewListTagsOnTodo
-		case *showTodosForTag > 0:
-			args = strconv.Itoa(*showTodosForTag)
-			fabricateCommand = command.NewListTodosForTag
-		default:
-			fabricateCommand = command.NewListTags
-		}
-	case tag.Name():
-		tag.Parse(flag.Args()[1:])
-		switch {
-		case *tagRm && len(tag.Args()) > 1:
-			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
-			fabricateCommand = command.NewRemoveTagFromTodo
-		case *tagRm && len(tag.Args()) == 1:
-			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
-			fabricateCommand = command.NewRemoveTag
-		case *tagAdd:
-			args = strings.TrimSpace(strings.Join(tag.Args(), " "))
-			fabricateCommand = command.NewAddTag
-		default:
-			fabricateCommand = command.NewTagTodo
-		}
-	default:
+	fabricateCommand, args, err := command.Fabricate(
+		flag.Args(),
+		list,
+		add,
+		doDelete,
+		toggle,
+		edit,
+		doClear,
+		swap,
+		tags,
+		showTagsOnTodo,
+		showTodosForTag,
+		tag,
+		tagRm,
+		tagAdd,
+	)
+	if errors.Is(command.ErrNoCommandFound, err) {
 		flag.Usage()
-		return 2
+		return 1
 	}
 
 	cmd, err := fabricateCommand(todoList, view, args)

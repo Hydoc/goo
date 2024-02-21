@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const (
+var (
 	ErrInvalidId           = "%s is an invalid id"
 	ErrNoTodoWithId        = "there is no todo with id %d"
 	ErrNoTagWithId         = "there is no tag with id %d"
@@ -13,6 +13,7 @@ const (
 	ErrTagAlreadyExists    = "the tag %s already exists"
 	ErrTodoDoesNotHaveTag  = "the todo %d does not have tag with id %d"
 	ErrTodoHasNoTags       = "the todo has no tags"
+	ErrNoCommandFound      = errors.New("the command could not be found")
 )
 
 func errTodoHasNoTags() error {

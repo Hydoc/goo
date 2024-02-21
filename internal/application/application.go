@@ -138,7 +138,7 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		tagRm,
 		tagAdd,
 	)
-	if errors.Is(command.ErrNoCommandFound, err) {
+	if errors.Is(command.ErrCommandNotFound, err) {
 		flag.Usage()
 		return 1
 	}

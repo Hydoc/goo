@@ -19,7 +19,7 @@ func (cmd *AddTodo) Execute() {
 
 func NewAddTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	if len(payload) == 0 {
-		return nil, errEmptyTodoNotAllowed()
+		return nil, ErrEmptyTodoNotAllowed
 	}
 
 	return &AddTodo{todoList, view, payload}, nil

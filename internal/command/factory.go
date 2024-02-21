@@ -49,6 +49,6 @@ func Fabricate(flagArgs []string, list *flag.FlagSet, add *flag.FlagSet, doDelet
 			return NewTagTodo, args, nil
 		}
 	default:
-		return nil, "", ErrNoCommandFound
+		return nil, "", ErrCommandNotFound
 	}
 }

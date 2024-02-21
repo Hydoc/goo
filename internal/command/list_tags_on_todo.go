@@ -29,7 +29,7 @@ func NewListTagsOnTodo(todoList *model.TodoList, view view.View, payload string)
 	}
 
 	if !todo.HasTags() {
-		return nil, errTodoHasNoTags()
+		return nil, ErrTodoHasNoTags
 	}
 
 	return &ListTagsOnTodo{todoList, view, idOfTodo}, nil

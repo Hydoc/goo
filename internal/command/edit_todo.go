@@ -38,7 +38,7 @@ func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Comm
 	newLabel := strings.Join(splitBySpace[1:], " ")
 
 	if len(newLabel) == 0 {
-		return nil, errEmptyTodoNotAllowed()
+		return nil, ErrEmptyTodoNotAllowed
 	}
 
 	return &EditTodo{todoList, view, id, newLabel}, nil

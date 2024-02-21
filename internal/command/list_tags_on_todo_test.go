@@ -92,7 +92,7 @@ func TestNewListTagsOnTodo(t *testing.T) {
 				TagList: make([]*model.Tag, 0),
 			},
 			want: nil,
-			err:  errTodoHasNoTags(),
+			err:  ErrTodoHasNoTags,
 		},
 	}
 

@@ -137,3 +137,81 @@ func TestTodo_AddTag(t *testing.T) {
 		})
 	}
 }
+
+func TestTodo_HasTags(t *testing.T) {
+	tests := []struct {
+		name string
+		todo *Todo
+		want bool
+	}{
+		{
+			name: "true if todo has tag",
+			todo: &Todo{
+				Id:     0,
+				Label:  "",
+				IsDone: false,
+				Tags:   []TagId{1},
+			},
+			want: true,
+		},
+		{
+			name: "false if todo does not have tags",
+			todo: &Todo{
+				Id:     0,
+				Label:  "",
+				IsDone: false,
+				Tags:   make([]TagId, 0),
+			},
+			want: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todo.HasTags()
+
+			if test.want != got {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}
+
+func TestTodo_LabelAsString(t *testing.T) {
+	tests := []struct {
+		name string
+		todo *Todo
+		want string
+	}{
+		{
+			name: "correct string when todo has tags",
+			todo: &Todo{
+				Id:     0,
+				Label:  "Test Label",
+				IsDone: false,
+				Tags:   []TagId{1},
+			},
+			want: "Test Label 🏷",
+		},
+		{
+			name: "false if todo does not have tags",
+			todo: &Todo{
+				Id:     0,
+				Label:  "Test Label",
+				IsDone: false,
+				Tags:   make([]TagId, 0),
+			},
+			want: "Test Label",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todo.LabelAsString()
+
+			if test.want != got {
+				t.Errorf("want %v, got %v", test.want, got)
+			}
+		})
+	}
+}

@@ -38,13 +38,18 @@ func NewTagTodo(todoList *model.TodoList, view view.View, payload string) (Comma
 		return nil, errInvalidId(splitBySpace[1])
 	}
 
-	if !todoList.Has(todoIdToTag) {
+	todo := todoList.Find(todoIdToTag)
+	if todo == nil {
 		return nil, fmt.Errorf(ErrNoTodoWithId, todoIdToTag)
 	}
 
 	tag := todoList.FindTag(tagId)
 	if tag == nil {
 		return nil, fmt.Errorf(ErrNoTagWithId, tagId)
+	}
+
+	if todo.HasTag(tag.Id) {
+		return nil, errTodoAlreadyHasTag(todoIdToTag, tagId)
 	}
 
 	return &TagTodo{todoList, view, todoIdToTag, tag.Id}, nil

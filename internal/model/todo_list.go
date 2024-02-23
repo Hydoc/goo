@@ -7,12 +7,17 @@ import (
 )
 
 type TodoList struct {
-	Filename string
-	Items    []*Todo
+	Filename string  `json:"-"`
+	Items    []*Todo `json:"items"`
+	TagList  []*Tag  `json:"tagList"`
 }
 
 func (list *TodoList) Add(todo *Todo) {
 	list.Items = append(list.Items, todo)
+}
+
+func (list *TodoList) AddTag(tag *Tag) {
+	list.TagList = append(list.TagList, tag)
 }
 
 func (list *TodoList) Swap(firstId, secondId int) {
@@ -32,15 +37,48 @@ func (list *TodoList) Find(id int) *Todo {
 	return nil
 }
 
+func (list *TodoList) FindTag(id int) *Tag {
+	for _, tag := range list.TagList {
+		if tag.Id == TagId(id) {
+			return tag
+		}
+	}
+	return nil
+}
+
+func (list *TodoList) TagTodo(id int, tagId TagId) {
+	todo := list.Find(id)
+	todo.AddTag(tagId)
+}
+
+func (list *TodoList) RemoveTagFromTodo(tagId TagId, todoId int) {
+	todo := list.Find(todoId)
+	todo.RemoveTag(tagId)
+}
+
 func (list *TodoList) LenOfLongestTodo() int {
 	if !list.HasItems() {
 		return 0
 	}
 
-	current := len(list.Items[0].Label)
+	current := len(list.Items[0].LabelAsString())
 	for _, todo := range list.Items {
-		if len(todo.Label) > current {
-			current = len(todo.Label)
+		if len(todo.LabelAsString()) > current {
+			current = len(todo.LabelAsString())
+		}
+	}
+	return current
+}
+
+func (list *TodoList) LenOfLongestTag() int {
+	if len(list.TagList) == 0 {
+		return 0
+	}
+
+	current := len(list.TagList[0].Name)
+	for _, tag := range list.TagList {
+		if len(tag.Name) > current {
+			current = len(tag.Name)
 		}
 	}
 	return current
@@ -57,6 +95,24 @@ func (list *TodoList) Edit(id int, label string) {
 func (list *TodoList) Has(id int) bool {
 	for _, todo := range list.Items {
 		if todo.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (list *TodoList) HasTag(id TagId) bool {
+	for _, tag := range list.TagList {
+		if tag.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (list *TodoList) HasTagWith(name string) bool {
+	for _, tag := range list.TagList {
+		if tag.Name == name {
 			return true
 		}
 	}
@@ -85,6 +141,22 @@ func (list *TodoList) Toggle(id int) {
 	}
 }
 
+func (list *TodoList) TodosForTag(tagId TagId) *TodoList {
+	//goland:noinspection GoPreferNilSlice
+	todosForTag := []*Todo{}
+	for _, todo := range list.Items {
+		if todo.HasTag(tagId) {
+			todosForTag = append(todosForTag, todo)
+		}
+	}
+
+	return &TodoList{
+		Filename: list.Filename,
+		Items:    todosForTag,
+		TagList:  list.TagList,
+	}
+}
+
 func (list *TodoList) SortedByIdAndState() *TodoList {
 	itemsCopy := make([]*Todo, len(list.Items))
 	copy(itemsCopy, list.Items)
@@ -94,10 +166,11 @@ func (list *TodoList) SortedByIdAndState() *TodoList {
 	return &TodoList{
 		Filename: list.Filename,
 		Items:    itemsCopy,
+		TagList:  list.TagList,
 	}
 }
 
-func (list *TodoList) NextId() int {
+func (list *TodoList) NextTodoId() int {
 	if len(list.Items) == 0 {
 		return 1
 	}
@@ -105,8 +178,16 @@ func (list *TodoList) NextId() int {
 	return list.Items[len(list.Items)-1].Id + 1
 }
 
+func (list *TodoList) NextTagId() TagId {
+	if len(list.TagList) == 0 {
+		return 1
+	}
+
+	return list.TagList[len(list.TagList)-1].Id + 1
+}
+
 func (list *TodoList) SaveToFile() {
-	encoded, _ := json.Marshal(list.Items)
+	encoded, _ := json.Marshal(list)
 	_ = os.WriteFile(list.Filename, encoded, 0644)
 }
 
@@ -114,20 +195,55 @@ func (list *TodoList) Clear() {
 	list.Items = make([]*Todo, 0)
 }
 
+func (list *TodoList) TagsForTodo(todoId int) []*Tag {
+	todo := list.Find(todoId)
+
+	//goland:noinspection GoPreferNilSlice
+	out := []*Tag{}
+	for _, tagId := range todo.Tags {
+		for _, tag := range list.TagList {
+			if tagId == tag.Id {
+				out = append(out, tag)
+			}
+		}
+	}
+	return out
+}
+
+func (list *TodoList) RemoveTag(id TagId) {
+	for _, todo := range list.Items {
+		if todo.HasTag(id) {
+			todo.RemoveTag(id)
+		}
+	}
+	indexOfTag := slices.IndexFunc(list.TagList, func(tag *Tag) bool {
+		return tag.Id == id
+	})
+
+	if indexOfTag > -1 {
+		list.TagList = append(list.TagList[:indexOfTag], list.TagList[indexOfTag+1:]...)
+	}
+}
+
 func NewTodoListFromFile(filename string) (*TodoList, error) {
-	var items []*Todo
+	var todoList *TodoList
 	jsonBytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonBytes, &items)
+	err = json.Unmarshal(jsonBytes, &todoList)
 	if err != nil {
 		return nil, err
 	}
 
+	if todoList.TagList == nil {
+		todoList.TagList = make([]*Tag, 0)
+	}
+
 	return &TodoList{
 		Filename: filename,
-		Items:    items,
+		Items:    todoList.Items,
+		TagList:  todoList.TagList,
 	}, nil
 }

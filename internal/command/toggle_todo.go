@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -22,11 +21,11 @@ func (cmd *ToggleTodo) Execute() {
 func NewToggleTodo(todoList *model.TodoList, view view.View, payload string) (Command, error) {
 	id, err := strconv.Atoi(payload)
 	if err != nil {
-		return nil, fmt.Errorf("%s is an invalid id", payload)
+		return nil, errInvalidId(payload)
 	}
 
 	if !todoList.Has(id) {
-		return nil, fmt.Errorf("there is no todo with id %d", id)
+		return nil, errNoTodoWithId(id)
 	}
 
 	return &ToggleTodo{todoList, view, id}, nil

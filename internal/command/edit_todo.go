@@ -1,8 +1,6 @@
 package command
 
 import (
-	"errors"
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -29,17 +27,17 @@ func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Comm
 	id, err := strconv.Atoi(splitBySpace[0])
 
 	if err != nil {
-		return nil, fmt.Errorf("can not edit todo, id is missing")
+		return nil, errInvalidId(splitBySpace[0])
 	}
 
 	if !todoList.Has(id) {
-		return nil, fmt.Errorf("there is no todo with id %d", id)
+		return nil, errNoTodoWithId(id)
 	}
 
 	newLabel := strings.Join(splitBySpace[1:], " ")
 
 	if len(newLabel) == 0 {
-		return nil, errors.New("empty todo is not allowed")
+		return nil, ErrEmptyTodoNotAllowed
 	}
 
 	return &EditTodo{todoList, view, id, newLabel}, nil

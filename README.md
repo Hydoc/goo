@@ -4,7 +4,7 @@
 
 # Goo
 
-A simple CLI todo list written in Go that supports different files.
+A simple CLI todo list written in Go that supports different files, editing and tags!
 
 Example
 

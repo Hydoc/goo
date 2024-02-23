@@ -25,7 +25,7 @@ func NewSwap(todoList *model.TodoList, view view.View, payload string) (Command,
 	splitBySpace := strings.Split(payload, " ")
 
 	if len(splitBySpace) < 2 || len(splitBySpace) > 2 {
-		return nil, fmt.Errorf("can not swap, need two ids seperated by space")
+		return nil, fmt.Errorf("can not swap, need two ids separated by space")
 	}
 
 	var ids []int

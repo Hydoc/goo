@@ -44,14 +44,14 @@ func TestNewSwap(t *testing.T) {
 		{
 			name:     "not create when arguments smaller than 2",
 			payload:  "1",
-			err:      fmt.Errorf("can not swap, need two ids seperated by space"),
+			err:      fmt.Errorf("can not swap, need two ids separated by space"),
 			todoList: &model.TodoList{},
 			want:     nil,
 		},
 		{
 			name:     "not create when arguments greater than 2",
 			payload:  "1 2 3",
-			err:      fmt.Errorf("can not swap, need two ids seperated by space"),
+			err:      fmt.Errorf("can not swap, need two ids separated by space"),
 			todoList: &model.TodoList{},
 			want:     nil,
 		},

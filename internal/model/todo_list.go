@@ -192,6 +192,21 @@ func (list *TodoList) TagsForTodo(todoId int) []*Tag {
 	return out
 }
 
+func (list *TodoList) RemoveTag(id TagId) {
+	for _, todo := range list.Items {
+		if todo.HasTag(id) {
+			todo.RemoveTag(id)
+		}
+	}
+	indexOfTag := slices.IndexFunc(list.TagList, func(tag *Tag) bool {
+		return tag.Id == id
+	})
+
+	if indexOfTag > -1 {
+		list.TagList = append(list.TagList[:indexOfTag], list.TagList[indexOfTag+1:]...)
+	}
+}
+
 func NewTodoListFromFile(filename string) (*TodoList, error) {
 	var todoList *TodoList
 	jsonBytes, err := os.ReadFile(filename)

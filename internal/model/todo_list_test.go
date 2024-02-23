@@ -956,3 +956,116 @@ func TestTodoList_TagsForTodo(t *testing.T) {
 		})
 	}
 }
+
+func TestTodoList_RemoveTag(t *testing.T) {
+	tests := []struct {
+		name        string
+		wantItems   []*Todo
+		wantTagList []*Tag
+		todoList    *TodoList
+		idToRemove  TagId
+	}{
+		{
+			name:       "remove a tag",
+			idToRemove: 25,
+			wantItems: []*Todo{
+				{
+					Id:     1,
+					Label:  "Test",
+					IsDone: false,
+					Tags:   make([]TagId, 0),
+				},
+			},
+			wantTagList: make([]*Tag, 0),
+			todoList: &TodoList{
+				Filename: "",
+				Items: []*Todo{
+					{
+						Id:     1,
+						Label:  "Test",
+						IsDone: false,
+						Tags:   []TagId{25},
+					},
+				},
+				TagList: []*Tag{
+					NewTag(25, "test tag"),
+				},
+			},
+		},
+		{
+			name: "remove a tag but not from todo if it does not have the id",
+			wantItems: []*Todo{
+				{
+					Id:     1,
+					Label:  "Test",
+					IsDone: false,
+					Tags:   []TagId{25},
+				},
+			},
+			wantTagList: []*Tag{
+				NewTag(25, "test tag"),
+			},
+			todoList: &TodoList{
+				Filename: "",
+				Items: []*Todo{
+					{
+						Id:     1,
+						Label:  "Test",
+						IsDone: false,
+						Tags:   []TagId{25},
+					},
+				},
+				TagList: []*Tag{
+					NewTag(25, "test tag"),
+					NewTag(1, "test tag #2"),
+				},
+			},
+			idToRemove: 1,
+		},
+		{
+			name:       "not remove a tag when tag can not be found",
+			idToRemove: 800,
+			wantItems: []*Todo{
+				{
+					Id:     1,
+					Label:  "Test",
+					IsDone: false,
+					Tags:   []TagId{25},
+				},
+			},
+			wantTagList: []*Tag{
+				NewTag(25, "test tag"),
+			},
+			todoList: &TodoList{
+				Filename: "",
+				Items: []*Todo{
+					{
+						Id:     1,
+						Label:  "Test",
+						IsDone: false,
+						Tags:   []TagId{25},
+					},
+				},
+				TagList: []*Tag{
+					NewTag(25, "test tag"),
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.todoList.RemoveTag(test.idToRemove)
+			gotItems := test.todoList.Items
+			gotTagList := test.todoList.TagList
+
+			if !reflect.DeepEqual(gotItems, test.wantItems) {
+				t.Errorf("want items %#v, got %#v", test.wantItems, gotItems)
+			}
+
+			if !reflect.DeepEqual(gotTagList, test.wantTagList) {
+				t.Errorf("want tag list %#v, got %#v", test.wantTagList, gotTagList)
+			}
+		})
+	}
+}

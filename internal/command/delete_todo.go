@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -26,7 +25,7 @@ func NewDeleteTodo(todoList *model.TodoList, view view.View, payload string) (Co
 	}
 
 	if !todoList.Has(id) {
-		return nil, fmt.Errorf(ErrNoTodoWithId, id)
+		return nil, errNoTodoWithId(id)
 	}
 
 	return &DeleteTodo{todoList, view, id}, nil

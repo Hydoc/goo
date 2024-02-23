@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -32,7 +31,7 @@ func NewEditTodo(todoList *model.TodoList, view view.View, payload string) (Comm
 	}
 
 	if !todoList.Has(id) {
-		return nil, fmt.Errorf(ErrNoTodoWithId, id)
+		return nil, errNoTodoWithId(id)
 	}
 
 	newLabel := strings.Join(splitBySpace[1:], " ")

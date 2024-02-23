@@ -91,7 +91,7 @@ func TestAddTag_Execute(t *testing.T) {
 		t.Error("expected todo list to have tag my coool tag")
 	}
 
-	if view.RenderTagCalls == 0 {
+	if view.RenderTagsCalls == 0 {
 		t.Error("expected view.RenderTags to have been called")
 	}
 

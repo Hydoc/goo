@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
@@ -74,7 +73,7 @@ func TestNewListTagsOnTodo(t *testing.T) {
 				TagList:  make([]*model.Tag, 0),
 			},
 			want: nil,
-			err:  fmt.Errorf(ErrNoTodoWithId, 1),
+			err:  errNoTodoWithId(1),
 		},
 		{
 			name:    "not create due to todo has no tags",
@@ -133,7 +132,7 @@ func TestListTagsOnTodo_Execute(t *testing.T) {
 	cmd, _ := NewListTagsOnTodo(todoList, view, "1")
 	cmd.Execute()
 
-	if view.RenderTagCalls == 0 {
+	if view.RenderTagsCalls == 0 {
 		t.Error("expected view.RenderTags to have been called")
 	}
 }

@@ -36,7 +36,7 @@ func NewSwap(todoList *model.TodoList, view view.View, payload string) (Command,
 		}
 
 		if !todoList.Has(id) {
-			return nil, fmt.Errorf(ErrNoTodoWithId, id)
+			return nil, errNoTodoWithId(id)
 		}
 		ids = append(ids, id)
 	}

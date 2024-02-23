@@ -1069,3 +1069,57 @@ func TestTodoList_RemoveTag(t *testing.T) {
 		})
 	}
 }
+
+func TestTodoList_TodosForTag(t *testing.T) {
+	tests := []struct {
+		name          string
+		tagIdToSearch TagId
+		wantTodoItems []*Todo
+		todoList      *TodoList
+	}{
+		{
+			name:          "find todos for tag",
+			tagIdToSearch: 1,
+			wantTodoItems: []*Todo{
+				{123, "i should be in", false, []TagId{1}},
+				{789, "i also should be in", false, []TagId{1}},
+			},
+			todoList: &TodoList{
+				Filename: "test.json",
+				Items: []*Todo{
+					NewTodo("irrelevant #1", 1),
+					{123, "i should be in", false, []TagId{1}},
+					NewTodo("irrelevant #2", 1),
+					{789, "i also should be in", false, []TagId{1}},
+				},
+				TagList: []*Tag{
+					NewTag(1, "test tag"),
+				},
+			},
+		},
+		{
+			name:          "empty slice for not found todos",
+			tagIdToSearch: 1,
+			wantTodoItems: make([]*Todo, 0),
+			todoList: &TodoList{
+				Filename: "",
+				Items: []*Todo{
+					NewTodo("test", 123),
+				},
+				TagList: []*Tag{
+					NewTag(1, "test tag"),
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.todoList.TodosForTag(test.tagIdToSearch)
+
+			if !reflect.DeepEqual(got.Items, test.wantTodoItems) {
+				t.Errorf("want %#v, got %#v", test.wantTodoItems, got)
+			}
+		})
+	}
+}

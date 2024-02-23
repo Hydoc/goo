@@ -76,14 +76,14 @@ func TestNewTagTodo(t *testing.T) {
 		{
 			name:     "not create due to missing todo in todo list",
 			payload:  "1 13",
-			err:      fmt.Errorf(ErrNoTodoWithId, 13),
+			err:      errNoTodoWithId(13),
 			todoList: &model.TodoList{},
 			want:     nil,
 		},
 		{
 			name:    "not create due to missing tag in tag list",
 			payload: "1 13",
-			err:     fmt.Errorf(ErrNoTagWithId, 1),
+			err:     errNoTagWithId(1),
 			todoList: &model.TodoList{
 				Items: []*model.Todo{
 					model.NewTodo("Test", 13),

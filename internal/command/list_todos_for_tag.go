@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -10,11 +9,11 @@ import (
 type ListTodosForTag struct {
 	todoList *model.TodoList
 	view     view.View
-	idOfTag  int
+	idOfTag  model.TagId
 }
 
 func (cmd *ListTodosForTag) Execute() {
-	cmd.view.RenderLine("LIST_TODOS_FOR_TAG")
+	cmd.view.RenderList(cmd.todoList.TodosForTag(cmd.idOfTag))
 }
 
 func NewListTodosForTag(todoList *model.TodoList, view view.View, payload string) (Command, error) {
@@ -24,8 +23,8 @@ func NewListTodosForTag(todoList *model.TodoList, view view.View, payload string
 	}
 
 	if !todoList.HasTag(model.TagId(idOfTag)) {
-		return nil, fmt.Errorf(ErrNoTagWithId, idOfTag)
+		return nil, errNoTagWithId(idOfTag)
 	}
 
-	return &ListTodosForTag{todoList, view, idOfTag}, nil
+	return &ListTodosForTag{todoList, view, model.TagId(idOfTag)}, nil
 }

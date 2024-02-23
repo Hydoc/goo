@@ -31,7 +31,7 @@ func TestListTags_Execute(t *testing.T) {
 	cmd, _ := NewListTags(todoList, view, "")
 	cmd.Execute()
 
-	if view.RenderTagCalls == 0 {
+	if view.RenderTagsCalls == 0 {
 		t.Error("expected view.RenderTags to have been called")
 	}
 }

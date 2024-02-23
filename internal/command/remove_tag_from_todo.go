@@ -40,12 +40,12 @@ func NewRemoveTagFromTodo(todoList *model.TodoList, view view.View, payload stri
 
 	todo := todoList.Find(todoId)
 	if todo == nil {
-		return nil, fmt.Errorf(ErrNoTodoWithId, todoId)
+		return nil, errNoTodoWithId(todoId)
 	}
 
 	tag := todoList.FindTag(tagId)
 	if tag == nil {
-		return nil, fmt.Errorf(ErrNoTagWithId, tagId)
+		return nil, errNoTagWithId(tagId)
 	}
 
 	if !todo.HasTag(model.TagId(tagId)) {

@@ -40,12 +40,12 @@ func NewTagTodo(todoList *model.TodoList, view view.View, payload string) (Comma
 
 	todo := todoList.Find(todoIdToTag)
 	if todo == nil {
-		return nil, fmt.Errorf(ErrNoTodoWithId, todoIdToTag)
+		return nil, errNoTodoWithId(todoIdToTag)
 	}
 
 	tag := todoList.FindTag(tagId)
 	if tag == nil {
-		return nil, fmt.Errorf(ErrNoTagWithId, tagId)
+		return nil, errNoTagWithId(tagId)
 	}
 
 	if todo.HasTag(tag.Id) {

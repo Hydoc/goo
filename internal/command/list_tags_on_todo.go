@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -25,7 +24,7 @@ func NewListTagsOnTodo(todoList *model.TodoList, view view.View, payload string)
 
 	todo := todoList.Find(idOfTodo)
 	if todo == nil {
-		return nil, fmt.Errorf(ErrNoTodoWithId, idOfTodo)
+		return nil, errNoTodoWithId(idOfTodo)
 	}
 
 	if !todo.HasTags() {

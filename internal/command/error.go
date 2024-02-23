@@ -28,3 +28,11 @@ func errInvalidId(id string) error {
 func errTodoAlreadyHasTag(todoId, tagId int) error {
 	return errors.New(fmt.Sprintf(ErrTodoAlreadyHasTag, todoId, tagId))
 }
+
+func errNoTodoWithId(id int) error {
+	return errors.New(fmt.Sprintf(ErrNoTodoWithId, id))
+}
+
+func errNoTagWithId(id int) error {
+	return errors.New(fmt.Sprintf(ErrNoTagWithId, id))
+}

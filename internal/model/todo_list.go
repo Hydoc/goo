@@ -141,6 +141,22 @@ func (list *TodoList) Toggle(id int) {
 	}
 }
 
+func (list *TodoList) TodosForTag(tagId TagId) *TodoList {
+	//goland:noinspection GoPreferNilSlice
+	todosForTag := []*Todo{}
+	for _, todo := range list.Items {
+		if todo.HasTag(tagId) {
+			todosForTag = append(todosForTag, todo)
+		}
+	}
+
+	return &TodoList{
+		Filename: list.Filename,
+		Items:    todosForTag,
+		TagList:  list.TagList,
+	}
+}
+
 func (list *TodoList) SortedByIdAndState() *TodoList {
 	itemsCopy := make([]*Todo, len(list.Items))
 	copy(itemsCopy, list.Items)
@@ -150,6 +166,7 @@ func (list *TodoList) SortedByIdAndState() *TodoList {
 	return &TodoList{
 		Filename: list.Filename,
 		Items:    itemsCopy,
+		TagList:  list.TagList,
 	}
 }
 
@@ -181,6 +198,7 @@ func (list *TodoList) Clear() {
 func (list *TodoList) TagsForTodo(todoId int) []*Tag {
 	todo := list.Find(todoId)
 
+	//goland:noinspection GoPreferNilSlice
 	out := []*Tag{}
 	for _, tagId := range todo.Tags {
 		for _, tag := range list.TagList {

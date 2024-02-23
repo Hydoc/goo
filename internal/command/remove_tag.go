@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
 	"strconv"
@@ -29,7 +28,7 @@ func NewRemoveTag(todoList *model.TodoList, view view.View, payload string) (Com
 
 	tagId := model.TagId(rawTagId)
 	if !todoList.HasTag(tagId) {
-		return nil, fmt.Errorf(ErrNoTagWithId, tagId)
+		return nil, errNoTagWithId(rawTagId)
 	}
 
 	return &RemoveTag{todoList, view, tagId}, nil

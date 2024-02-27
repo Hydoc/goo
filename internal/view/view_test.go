@@ -61,7 +61,7 @@ func TestStdoutView_RenderList(t *testing.T) {
 		},
 		{
 			name:   "multiple items with one tag",
-			want:   "ID  TASK                  STATUS\n--------------------------------\n1   should be first 🏷      ○\n",
+			want:   "ID  TASK                  STATUS\n--------------------------------\n1   should be first 🏷       ○\n",
 			buffer: bytes.NewBuffer(make([]byte, 0)),
 			todoList: &model.TodoList{
 				Items: []*model.Todo{

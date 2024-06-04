@@ -2,10 +2,11 @@ package command
 
 import (
 	"fmt"
-	"github.com/Hydoc/goo/internal/model"
-	"github.com/Hydoc/goo/internal/view"
 	"strconv"
 	"strings"
+
+	"github.com/Hydoc/goo/internal/model"
+	"github.com/Hydoc/goo/internal/view"
 )
 
 type RemoveTagFromTodo struct {

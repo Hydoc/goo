@@ -1,8 +1,9 @@
 package command
 
 import (
-	"github.com/Hydoc/goo/internal/model"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestListTodos_Execute(t *testing.T) {

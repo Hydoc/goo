@@ -2,13 +2,14 @@ package command
 
 import (
 	"flag"
-	"github.com/Hydoc/goo/internal/model"
-	"github.com/Hydoc/goo/internal/view"
 	"strconv"
 	"strings"
+
+	"github.com/Hydoc/goo/internal/model"
+	"github.com/Hydoc/goo/internal/view"
 )
 
-func Fabricate(todoList *model.TodoList, view view.View, flagArgs []string, list *flag.FlagSet, add *flag.FlagSet, doDelete *flag.FlagSet, toggle *flag.FlagSet, edit *flag.FlagSet, doClear *flag.FlagSet, swap *flag.FlagSet, tags *flag.FlagSet, showTagsOnTodo *int, showTodosForTag *int, tag *flag.FlagSet, tagRm *bool, tagAdd *bool) (Command, error) {
+func Fabricate(todoList *model.TodoList, view view.View, flagArgs []string, list *flag.FlagSet, add *flag.FlagSet, doDelete *flag.FlagSet, toggle *flag.FlagSet, edit *flag.FlagSet, doClear *flag.FlagSet, swap *flag.FlagSet, tags *flag.FlagSet, showTagsOnTodo *int, showTodosForTag *int, tag *flag.FlagSet, tagRm *bool, tagAdd *bool, versionFlag *flag.FlagSet, version string) (Command, error) {
 	baseArgs := strings.TrimSpace(strings.Join(flagArgs[1:], " "))
 	switch flagArgs[0] {
 	case list.Name():
@@ -25,6 +26,8 @@ func Fabricate(todoList *model.TodoList, view view.View, flagArgs []string, list
 		return NewClear(todoList, view, baseArgs)
 	case swap.Name():
 		return NewSwap(todoList, view, baseArgs)
+	case versionFlag.Name():
+		return NewPrintVersion(view, version)
 	case tags.Name():
 		tags.Parse(flagArgs[1:])
 		switch {

@@ -1,9 +1,10 @@
 package command
 
 import (
-	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestNewListTodosForTag(t *testing.T) {

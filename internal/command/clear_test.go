@@ -2,9 +2,10 @@ package command
 
 import (
 	"errors"
-	"github.com/Hydoc/goo/internal/model"
 	"os"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestClear_Execute(t *testing.T) {

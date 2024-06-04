@@ -3,15 +3,17 @@ package application
 import (
 	"errors"
 	"flag"
+	"os"
+	"path/filepath"
+
 	"github.com/Hydoc/goo/internal/command"
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
-	"os"
-	"path/filepath"
 )
 
 const (
 	defaultFileName = ".goo.json"
+	version         = "1.4.3"
 	usage           = `How to use goo
   -f, --file
     Path to a file to use (has to be json, if the file does not exist it gets created, has to be the first argument before the subcommands)
@@ -44,7 +46,7 @@ const (
        -id <ID of tag:int> show all todos with this tag
 
   tag: tag handling
-    goo tag <ID of todo:int> <ID of the tag:int>
+    goo tag <ID of tag:int> <ID of the todo:int>
        adds the given tag to the todo
 
     goo tag -c <Label of the tag:string>
@@ -53,7 +55,10 @@ const (
     goo tag -rm
        remove a tag or a tag from a todo
        -rm <ID of tag:int> removes the tag from all todos and the tag itself
-       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo`
+       -rm <ID of tag:int> <ID of todo:int> removes the specific tag from the todo
+  
+  version: prints the version
+    goo version`
 )
 
 var filename string
@@ -85,6 +90,7 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 	tag := flag.NewFlagSet("tag", flag.ExitOnError)
 	tagRm := tag.Bool("rm", false, "delete a tag")
 	tagAdd := tag.Bool("c", false, "add a tag")
+	versionFlag := flag.NewFlagSet("version", flag.ExitOnError)
 
 	flag.Usage = func() {
 		view.RenderLine(usage)
@@ -139,6 +145,8 @@ func Main(view view.View, userHomeDir func() (string, error)) int {
 		tag,
 		tagRm,
 		tagAdd,
+		versionFlag,
+		version,
 	)
 	if err != nil {
 		view.RenderLine(err.Error())

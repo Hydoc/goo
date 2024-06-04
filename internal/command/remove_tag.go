@@ -1,10 +1,11 @@
 package command
 
 import (
-	"github.com/Hydoc/goo/internal/model"
-	"github.com/Hydoc/goo/internal/view"
 	"strconv"
 	"strings"
+
+	"github.com/Hydoc/goo/internal/model"
+	"github.com/Hydoc/goo/internal/view"
 )
 
 type RemoveTag struct {

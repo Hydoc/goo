@@ -1,9 +1,10 @@
 package command
 
 import (
+	"strings"
+
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
-	"strings"
 )
 
 type AddTag struct {

@@ -2,8 +2,9 @@ package view
 
 import (
 	"bytes"
-	"github.com/Hydoc/goo/internal/model"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestStdoutView_RenderLine(t *testing.T) {

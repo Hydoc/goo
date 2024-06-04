@@ -1,9 +1,10 @@
 package command
 
 import (
+	"strconv"
+
 	"github.com/Hydoc/goo/internal/model"
 	"github.com/Hydoc/goo/internal/view"
-	"strconv"
 )
 
 type ListTodosForTag struct {

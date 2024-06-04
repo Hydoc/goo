@@ -2,10 +2,11 @@ package command
 
 import (
 	"errors"
-	"github.com/Hydoc/goo/internal/model"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestNewRemoveTag(t *testing.T) {

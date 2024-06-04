@@ -3,10 +3,11 @@ package command
 import (
 	"errors"
 	"fmt"
-	"github.com/Hydoc/goo/internal/model"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestNewSwap(t *testing.T) {

@@ -2,9 +2,10 @@ package command
 
 import (
 	"flag"
-	"github.com/Hydoc/goo/internal/model"
 	"reflect"
 	"testing"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 func TestFabricate(t *testing.T) {
@@ -24,6 +25,8 @@ func TestFabricate(t *testing.T) {
 	tag := flag.NewFlagSet("tag", flag.ExitOnError)
 	tagRm := tag.Bool("rm", false, "delete a tag")
 	tagAdd := tag.Bool("c", false, "add a tag")
+	versionFlag := flag.NewFlagSet("version", flag.ExitOnError)
+	version := "1.4.3"
 
 	tests := []struct {
 		name     string
@@ -193,6 +196,13 @@ func TestFabricate(t *testing.T) {
 			todoList: &model.TodoList{},
 			err:      ErrCommandNotFound,
 		},
+		{
+			name:     "PrintVersion",
+			want:     reflect.TypeOf(&PrintVersion{}),
+			flagArgs: []string{"version"},
+			todoList: &model.TodoList{},
+			err:      nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -214,6 +224,8 @@ func TestFabricate(t *testing.T) {
 				tag,
 				tagRm,
 				tagAdd,
+				versionFlag,
+				version,
 			)
 
 			if err != nil && !reflect.DeepEqual(err, test.err) {

@@ -2,10 +2,11 @@ package view
 
 import (
 	"fmt"
-	"github.com/Hydoc/goo/internal/model"
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/Hydoc/goo/internal/model"
 )
 
 const (

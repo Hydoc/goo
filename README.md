@@ -37,7 +37,7 @@ export PATH=$PATH:$HOME/go/bin && goo add I did it!
 ### Flags
 
 * `-f, --file`: Path to the file to use (defaults to `~/.goo.json`, if it does not exist it gets created (**has to be
-  json**). The flag should always be **before** the subcommands
+  json**). The flag should always be **before** the subcommands)
     * `goo -f path/to/my-file.json add Hello World!`
 
 ### Commands
